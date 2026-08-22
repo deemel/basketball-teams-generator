@@ -71,15 +71,6 @@
         .reset-btn:hover {
             background-color: #c82333;
         }
-        .remove-all-btn {
-            background-color: #dc3545;
-            padding: 3px 8px;
-            font-size: 12px;
-            margin-left: 5px;
-        }
-        .remove-all-btn:hover {
-            background-color: #c82333;
-        }
         .top-action-row {
             display: flex;
             align-items: center;
@@ -276,7 +267,6 @@
                 <label class="select-all-label">
                     <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)"> Select All
                 </label>
-                <button onclick="removeAllPlayers()" class="remove-all-btn">Remove All</button>
                 <span id="playerCountDisplay" style="color: #666; font-size: 14px; font-weight: normal; margin-left: 5px;">Available: 0 / 0</span>
             </div>
         </div>
@@ -669,16 +659,6 @@
                 hideAlert();
                 renderPlayerList();
             }
-        }
-
-        function removeAllPlayers() {
-            players = [];
-            lastGameIndices = [];
-            pendingTeam1Indices = [];
-            pendingTeam2Indices = [];
-            document.getElementById('outputCard').style.display = 'none';
-            hideAlert();
-            renderPlayerList();
         }
 
         function toggleAvailable(index, isAvailable) {
