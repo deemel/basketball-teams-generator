@@ -291,12 +291,12 @@
         <h2>Teams Preview</h2>
         <div class="teams-container">
             <div class="team">
-                <h3>Team Black</h3>
-                <ol id="teamBlackList"></ol>
+                <h3>Team 1</h3>
+                <ol id="team1List"></ol>
             </div>
             <div class="team">
-                <h3>Team White</h3>
-                <ol id="teamWhiteList"></ol>
+                <h3>Team 2</h3>
+                <ol id="team2List"></ol>
             </div>
         </div>
         <!-- Accept Teams Button -->
@@ -531,8 +531,8 @@
         // Force initialization to custom roster (empty) on refresh
         let players = empty.map(p => ({ ...p }));
 
-        let pendingTeamBlackIndices = [];
-        let pendingTeamWhiteIndices = [];
+        let pendingTeam1Indices = [];
+        let pendingTeam2Indices = [];
         let lastGameIndices = [];
 
         function switchRoster() {
@@ -547,8 +547,8 @@
             
             players = sourceList.map(p => ({ ...p }));
             lastGameIndices = [];
-            pendingTeamBlackIndices = [];
-            pendingTeamWhiteIndices = [];
+            pendingTeam1Indices = [];
+            pendingTeam2Indices = [];
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
@@ -670,8 +670,8 @@
         function removeAllPlayers() {
             players = [];
             lastGameIndices = [];
-            pendingTeamBlackIndices = [];
-            pendingTeamWhiteIndices = [];
+            pendingTeam1Indices = [];
+            pendingTeam2Indices = [];
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
@@ -708,8 +708,8 @@
                 p.available = true;
             });
             lastGameIndices = [];
-            pendingTeamBlackIndices = [];
-            pendingTeamWhiteIndices = [];
+            pendingTeam1Indices = [];
+            pendingTeam2Indices = [];
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
@@ -767,25 +767,25 @@
             let chosenPlayers = prioritizedIndices.slice(0, totalNeeded);
             chosenPlayers.sort(() => Math.random() - 0.5);
 
-            pendingTeamBlackIndices = chosenPlayers.slice(0, perTeamInput);
-            pendingTeamWhiteIndices = chosenPlayers.slice(perTeamInput, totalNeeded);
+            pendingTeam1Indices = chosenPlayers.slice(0, perTeamInput);
+            pendingTeam2Indices = chosenPlayers.slice(perTeamInput, totalNeeded);
 
-            const teamBlackList = document.getElementById('teamBlackList');
-            const teamWhiteList = document.getElementById('teamWhiteList');
+            const team1List = document.getElementById('team1List');
+            const team2List = document.getElementById('team2List');
             
-            teamBlackList.innerHTML = '';
-            teamWhiteList.innerHTML = '';
+            team1List.innerHTML = '';
+            team2List.innerHTML = '';
 
-            pendingTeamBlackIndices.forEach(i => {
+            pendingTeam1Indices.forEach(i => {
                 let li = document.createElement('li');
                 li.textContent = players[i].name;
-                teamBlackList.appendChild(li);
+                team1List.appendChild(li);
             });
 
-            pendingTeamWhiteIndices.forEach(i => {
+            pendingTeam2Indices.forEach(i => {
                 let li = document.createElement('li');
                 li.textContent = players[i].name;
-                teamWhiteList.appendChild(li);
+                team2List.appendChild(li);
             });
 
             const acceptBtn = document.getElementById('acceptBtn');
@@ -796,7 +796,7 @@
         }
 
         function acceptLineup() {
-            let currentSelectedTeam = [...pendingTeamBlackIndices, ...pendingTeamWhiteIndices];
+            let currentSelectedTeam = [...pendingTeam1Indices, ...pendingTeam2Indices];
 
             players.forEach((p, i) => {
                 if (p.available) {
