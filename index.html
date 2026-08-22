@@ -549,6 +549,10 @@
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
+            
+            // Reset players per team setting to 5 on roster change
+            document.getElementById('playersPerTeamInput').value = 5;
+
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
@@ -710,6 +714,7 @@
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
+            document.getElementById('playersPerTeamInput').value = 5;
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
