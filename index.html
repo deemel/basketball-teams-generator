@@ -109,20 +109,6 @@
             font-weight: bold;
             color: #444;
         }
-        .player-list-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .select-all-label {
-            font-size: 13px;
-            font-weight: normal;
-            color: #555;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
         .player-list {
             border: 1px solid #ddd;
             padding: 10px;
@@ -138,6 +124,11 @@
             border-bottom: 2px solid #ccc;
             font-weight: bold;
             color: #444;
+        }
+        .header-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         .player-item {
             display: flex;
@@ -263,12 +254,7 @@
 
         <div class="player-list-container">
             <span>Select players available for next game:</span>
-            <div class="player-list-controls">
-                <label class="select-all-label">
-                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)"> Select All
-                </label>
-                <span id="playerCountDisplay" style="color: #666; font-size: 14px; font-weight: normal; margin-left: 5px;">Available: 0 / 0</span>
-            </div>
+            <span id="playerCountDisplay" style="color: #666; font-size: 14px; font-weight: normal;">Available: 0 / 0</span>
         </div>
         
         <!-- Dynamic Checkboxes Container -->
@@ -565,15 +551,17 @@
             document.getElementById('playerCountDisplay').textContent = `Available: ${availableCount} / ${total}`;
             
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-            if (total > 0 && availableCount === total) {
-                selectAllCheckbox.checked = true;
-                selectAllCheckbox.indeterminate = false;
-            } else if (availableCount === 0) {
-                selectAllCheckbox.checked = false;
-                selectAllCheckbox.indeterminate = false;
-            } else {
-                selectAllCheckbox.checked = false;
-                selectAllCheckbox.indeterminate = true;
+            if (selectAllCheckbox) {
+                if (total > 0 && availableCount === total) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (availableCount === 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                }
             }
         }
 
@@ -583,7 +571,26 @@
 
             let headerDiv = document.createElement('div');
             headerDiv.className = 'list-header';
-            headerDiv.innerHTML = `<span>Player Name</span><span>Games Played</span>`;
+
+            let headerLeftGroup = document.createElement('div');
+            headerLeftGroup.className = 'header-left-group';
+
+            let selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'selectAllCheckbox';
+            selectAllCheckbox.onchange = function() { toggleSelectAll(selectAllCheckbox.checked); };
+
+            let headerLabel = document.createElement('span');
+            headerLabel.textContent = "Player Name";
+
+            headerLeftGroup.appendChild(selectAllCheckbox);
+            headerLeftGroup.appendChild(headerLabel);
+
+            let headerRightSpan = document.createElement('span');
+            headerRightSpan.textContent = "Games Played";
+
+            headerDiv.appendChild(headerLeftGroup);
+            headerDiv.appendChild(headerRightSpan);
             container.appendChild(headerDiv);
 
             players.forEach((p, index) => {
