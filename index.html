@@ -3,7 +3,7 @@
 <head>
     <meta charset="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Teams Generator & Games Played Tracker</title>
+    <title>Teams Generator & Games Played Tracker</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
         }
         input[type="number"] {
             padding: 6px;
-            width: 60px;
+            width: 50px;
             font-size: 14px;
         }
         select {
@@ -65,32 +65,13 @@
         }
         .reset-btn {
             background-color: #dc3545;
-            padding: 8px 15px;
+            padding: 6px 12px;
             font-size: 14px;
         }
         .reset-btn:hover {
             background-color: #c82333;
         }
-        .top-action-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            margin-top: 15px;
-            gap: 10px;
-        }
-        .settings-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            background: #f9f9fc;
-            border-radius: 6px;
-            border: 1px solid #e1e1e8;
-            flex: 1;
-            margin-bottom: 0;
-        }
-        .roster-row {
+        .control-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -99,6 +80,12 @@
             border-radius: 6px;
             border: 1px solid #d0d7de;
             margin-bottom: 15px;
+            gap: 10px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .player-list-container {
             display: flex;
@@ -210,7 +197,7 @@
 <body>
 
     <div class="card">
-        <h2>Basketball Teams Generator & Games Played Tracker</h2>
+        <h2>Teams Generator & Games Played Tracker</h2>
 
         <!-- Custom Inline Message Banner -->
         <div id="customAlert" class="custom-alert">
@@ -218,31 +205,26 @@
             <button onclick="hideAlert()">&times;</button>
         </div>
 
-        <!-- Roster Selector Row -->
-        <div class="roster-row">
-            <label for="rosterSelect" style="font-weight: bold; color: #333; font-size: 14px;">Select Roster:</label>
-            <select id="rosterSelect" onchange="switchRoster()">
-                <!-- 1. Custom First -->
-                <option value="empty" selected>Custom Roster (Empty)</option>
-                
-                <!-- 2. Non-empty day-based and compound day-based rosters -->
-                <option value="monday">Monday</option>
-                <option value="thursday">Thursday</option>
-                <option value="thursdayGlenOaks">Thursday Glen Oaks</option>
-                <option value="saturday">Saturday</option>
-                <option value="sunday">Sunday</option>
-                
-                <!-- 3. Everything else sorted alphabetically -->
-                <option value="stelton">Stelton</option>
-            </select>
-        </div>
+        <!-- Combined Top Control Row -->
+        <div class="control-row">
+            <div class="control-group">
+                <label for="rosterSelect" style="font-weight: bold; color: #333; font-size: 13px;">Roster:</label>
+                <select id="rosterSelect" onchange="switchRoster()">
+                    <option value="empty" selected>Custom (Empty)</option>
+                    <option value="monday">Monday</option>
+                    <option value="thursday">Thursday</option>
+                    <option value="thursdayGlenOaks">Thursday Glen Oaks</option>
+                    <option value="saturday">Saturday</option>
+                    <option value="sunday">Sunday</option>
+                    <option value="stelton">Stelton</option>
+                </select>
+            </div>
 
-        <!-- Team Size Settings & Reset Button Row -->
-        <div class="top-action-row">
-            <div class="settings-row">
-                <label for="playersPerTeamInput" style="font-weight: bold; color: #444; font-size: 14px;">Players per team:</label>
+            <div class="control-group">
+                <label for="playersPerTeamInput" style="font-weight: bold; color: #444; font-size: 13px;">Players per team:</label>
                 <input type="number" id="playersPerTeamInput" value="5" min="1" max="15">
             </div>
+
             <button onclick="resetTracker()" class="reset-btn">Reset</button>
         </div>
         
@@ -254,7 +236,7 @@
 
         <div class="player-list-container">
             <span>Select players available for next game:</span>
-            <span id="playerCountDisplay" style="color: #666; font-size: 14px; font-weight: normal;">Available: 0 / 0</span>
+            <span id="playerCountDisplay" style="color: #666; font-size: 14px; font-weight: normal;"><b>Available:</b> 0 / 0</span>
         </div>
         
         <!-- Dynamic Checkboxes Container -->
@@ -548,7 +530,7 @@
         function updatePlayerCounts() {
             let total = players.length;
             let availableCount = players.filter(p => p.available).length;
-            document.getElementById('playerCountDisplay').textContent = `Available: ${availableCount} / ${total}`;
+            document.getElementById('playerCountDisplay').innerHTML = `<b>Available:</b> ${availableCount} / ${total}`;
             
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             if (selectAllCheckbox) {
