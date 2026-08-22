@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Teams Generator & Games Played Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 70%;
+            box-sizing: border-box;
+            margin-right: 5px;
+        }
+        input[type="number"] {
+            padding: 6px;
+            width: 60px;
+            font-size: 14px;
+        }
+        select {
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+        }
+        button {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            padding: 9px 15px;
+            font-size: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e55c00;
+        }
+        .accept-btn {
+            background-color: #28a745;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        .accept-btn:hover {
+            background-color: #218838;
+        }
+        .accept-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .reset-btn {
+            background-color: #dc3545;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        .reset-btn:hover {
+            background-color: #c82333;
+        }
+        .remove-all-btn {
+            background-color: #dc3545;
+            padding: 3px 8px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .remove-all-btn:hover {
+            background-color: #c82333;
+        }
+        .top-action-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f9f9fc;
+            border-radius: 6px;
+            border: 1px solid #e1e1e8;
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .roster-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: #eef2f7;
+            border-radius: 6px;
+            border: 1px solid #d0d7de;
+            margin-bottom: 15px;
+        }
+        .player-list-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        .player-list-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .select-all-label {
+            font-size: 13px;
+            font-weight: normal;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .player-list {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0 10px 0;
+            border-radius: 4px;
+        }
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #ccc;
+            font-weight: bold;
+            color: #444;
+        }
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .player-left-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stats-badge {
+            background: #eef2f7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            font-weight: bold;
+        }
+        .counter-controls {
+            display: flex;
+            gap: 3px;
+        }
+        .counter-btn {
+            padding: 2px 6px;
+            font-size: 12px;
+            background-color: #ddd;
+            color: #333;
+        }
+        .counter-btn:hover {
+            background-color: #ccc;
+        }
+        .teams-container {
+            display: flex;
+            gap: 20px;
+        }
+        .team {
+            flex: 1;
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .team ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .team li {
+            margin-bottom: 4px;
+        }
+        .custom-alert {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .custom-alert button {
+            background: transparent;
+            color: #856404;
+            font-size: 16px;
+            padding: 0 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Basketball Teams Generator & Games Played Tracker</h2>
+
+        <!-- Custom Inline Message Banner -->
+        <div id="customAlert" class="custom-alert">
+            <span id="customAlertMsg"></span>
+            <button onclick="hideAlert()">&times;</button>
+        </div>
+
+        <!-- Roster Selector Row -->
+        <div class="roster-row">
+            <label for="rosterSelect" style="font-weight: bold; color: #333; font-size: 14px;">Select Roster:</label>
+            <select id="rosterSelect" onchange="switchRoster()">
+                <!-- 1. Custom First -->
+                <option value="empty" selected>Custom Roster (Empty)</option>
+                
+                <!-- 2. Non-empty day-based and compound day-based rosters -->
+                <option value="monday">Monday</option>
+                <option value="thursday">Thursday</option>
+                <option value="thursdayGlenOaks">Thursday Glen Oaks</option>
+                <option value="saturday">Saturday</option>
+                <option value="sunday">Sunday</option>
+                
+                <!-- 3. Everything else sorted alphabetically -->
+                <option value="stelton">Stelton</option>
+            </select>
+        </div>
+
+        <!-- Team Size Settings & Reset Button Row -->
+        <div class="top-action-row">
+            <div class="settings-row">
+                <label for="playersPerTeamInput" style="font-weight: bold; color: #444; font-size: 14px;">Players per team:</label>
+                <input type="number" id="playersPerTeamInput" value="5" min="1" max="15">
+            </div>
+            <button onclick="resetTracker()" class="reset-btn">Reset</button>
+        </div>
+        
+        <!-- Add Player Form -->
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="newPlayerName" placeholder="Enter player name...">
+            <button onclick="addPlayer()">Add Player</button>
+        </div>
+
+        <div class="player-list-container">
+            <span>Select players available for next game:</span>
+            <div class="player-list-controls">
+                <label class="select-all-label">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)"> Select All
+                </label>
+                <button onclick="removeAllPlayers()" class="remove-all-btn">Remove All</button>
+                <span id="playerCountDisplay" style="color: #666; font-size: 14px; font-weight: normal; margin-left: 5px;">Available: 0 / 0</span>
+            </div>
+        </div>
+        
+        <!-- Dynamic Checkboxes Container -->
+        <div id="playerContainer" class="player-list"></div>
+
+        <button onclick="generateTeams()" style="width: 100%; margin-top: 10px;" id="generateBtnText">Generate Teams Preview</button>
+    </div>
+
+    <div class="card" id="outputCard" style="display:none;">
+        <h2>Teams Preview</h2>
+        <div class="teams-container">
+            <div class="team">
+                <h3>Team Black</h3>
+                <ol id="teamBlackList"></ol>
+            </div>
+            <div class="team">
+                <h3>Team White</h3>
+                <ol id="teamWhiteList"></ol>
+            </div>
+        </div>
+        <!-- Accept Teams Button -->
+        <button id="acceptBtn" class="accept-btn" onclick="acceptLineup()">Accept Teams & Update Games Played</button>
+    </div>
+
+    <script>
+        const empty = [];
+
+        const monday = [
+            { name: "Ah B", games: 0, available: true },
+            { name: "Alex", games: 0, available: true },
+            { name: "Andy", games: 0, available: true },
+            { name: "Aric", games: 0, available: true },
+            { name: "Benny", games: 0, available: true },
+            { name: "Billy", games: 0, available: true },
+            { name: "Brian", games: 0, available: true },
+            { name: "Chris", games: 0, available: true },
+            { name: "Danny", games: 0, available: true },
+            { name: "Deric", games: 0, available: true },
+            { name: "Eric", games: 0, available: true },
+            { name: "Fai", games: 0, available: true },
+            { name: "Francis", games: 0, available: true },
+            { name: "Howard", games: 0, available: true },
+            { name: "Jeffrey", games: 0, available: true },
+            { name: "Joe S", games: 0, available: true },
+            { name: "Kenji", games: 0, available: true },
+            { name: "Kenneth", games: 0, available: true },
+            { name: "Kit", games: 0, available: true },
+            { name: "Raymond", games: 0, available: true },
+            { name: "Sunny", games: 0, available: true },
+            { name: "Timmy", games: 0, available: true },
+            { name: "Travis", games: 0, available: true },
+            { name: "Wayne", games: 0, available: true },
+            { name: "奶仔", games: 0, available: true },
+            { name: "蔡哥", games: 0, available: true }
+        ];
+
+        const thursday = [
+            { name: "Benny", games: 0, available: true },
+            { name: "Bing Ng", games: 0, available: true },
+            { name: "Dan Lau", games: 0, available: true },
+            { name: "Danny", games: 0, available: true },
+            { name: "George Fung", games: 0, available: true },
+            { name: "Giles", games: 0, available: true },
+            { name: "Jack Lin", games: 0, available: true },
+            { name: "James", games: 0, available: true },
+            { name: "Jay Li", games: 0, available: true },
+            { name: "Kenny", games: 0, available: true },
+            { name: "Kok Kit Lee", games: 0, available: true },
+            { name: "Kwok", games: 0, available: true },
+            { name: "Michael Leung", games: 0, available: true },
+            { name: "Michael Poon", games: 0, available: true },
+            { name: "Nelson", games: 0, available: true },
+            { name: "Paul Chan", games: 0, available: true },
+            { name: "Peter", games: 0, available: true },
+            { name: "Phil", games: 0, available: true },
+            { name: "Steve", games: 0, available: true },
+            { name: "Tony Au", games: 0, available: true },
+            { name: "Wai Yip Lee", games: 0, available: true },
+            { name: "William Wong", games: 0, available: true },
+            { name: "二少", games: 0, available: true },
+            { name: "建哥", games: 0, available: true },
+            { name: "梁光远", games: 0, available: true },
+            { name: "韓家聲", games: 0, available: true }
+        ];
+
+        const thursdayGlenOaks = [
+            { name: "Alex", games: 0, available: true },
+            { name: "Amenophis", games: 0, available: true },
+            { name: "Andrew Ng", games: 0, available: true },
+            { name: "Benghor", games: 0, available: true },
+            { name: "Buddy", games: 0, available: true },
+            { name: "Danny", games: 0, available: true },
+            { name: "David", games: 0, available: true },
+            { name: "Demz", games: 0, available: true },
+            { name: "Devon", games: 0, available: true },
+            { name: "Flippa", games: 0, available: true },
+            { name: "Francis", games: 0, available: true },
+            { name: "Fred S", games: 0, available: true },
+            { name: "H", games: 0, available: true },
+            { name: "Hing", games: 0, available: true },
+            { name: "Indio T", games: 0, available: true },
+            { name: "James", games: 0, available: true },
+            { name: "James Lin", games: 0, available: true },
+            { name: "Jay Huang", games: 0, available: true },
+            { name: "Jimmy", games: 0, available: true },
+            { name: "Joe", games: 0, available: true },
+            { name: "Jt", games: 0, available: true },
+            { name: "Justin", games: 0, available: true },
+            { name: "Kevin King", games: 0, available: true },
+            { name: "KevinBookher", games: 0, available: true },
+            { name: "Kyth Trieu", games: 0, available: true },
+            { name: "Li", games: 0, available: true },
+            { name: "Todd", games: 0, available: true },
+            { name: "Tony Ng", games: 0, available: true }
+        ];
+
+        const saturday = [
+            { name: "3373", games: 0, available: true },
+            { name: "3977", games: 0, available: true },
+            { name: "449466", games: 0, available: true },
+            { name: "5463", games: 0, available: true },
+            { name: "7231", games: 0, available: true },
+            { name: "7624", games: 0, available: true },
+            { name: "7677", games: 0, available: true },
+            { name: "7763", games: 0, available: true },
+            { name: "8861", games: 0, available: true },
+            { name: "9178", games: 0, available: true },
+            { name: "Adrian T", games: 0, available: true },
+            { name: "Alex", games: 0, available: true },
+            { name: "Amenophis", games: 0, available: true },
+            { name: "Andrew Ng", games: 0, available: true },
+            { name: "Andrew Yu", games: 0, available: true },
+            { name: "Benghor", games: 0, available: true },
+            { name: "Brian Yu", games: 0, available: true },
+            { name: "Buddy", games: 0, available: true },
+            { name: "Corey", games: 0, available: true },
+            { name: "Danny", games: 0, available: true },
+            { name: "David", games: 0, available: true },
+            { name: "David Jang", games: 0, available: true },
+            { name: "Demz", games: 0, available: true },
+            { name: "Devon", games: 0, available: true },
+            { name: "Eddie Wu", games: 0, available: true },
+            { name: "Eliezer Epstein", games: 0, available: true },
+            { name: "Eric T", games: 0, available: true },
+            { name: "Flippa", games: 0, available: true },
+            { name: "Francis", games: 0, available: true },
+            { name: "Fred S", games: 0, available: true },
+            { name: "G", games: 0, available: true },
+            { name: "Gyu Seung", games: 0, available: true },
+            { name: "H", games: 0, available: true },
+            { name: "Hing", games: 0, available: true },
+            { name: "Indio T", games: 0, available: true },
+            { name: "Jabe", games: 0, available: true },
+            { name: "James", games: 0, available: true },
+            { name: "James Lin", games: 0, available: true },
+            { name: "Jason", games: 0, available: true },
+            { name: "Jay Huang", games: 0, available: true },
+            { name: "Jim Turvey", games: 0, available: true },
+            { name: "Jimmy", games: 0, available: true },
+            { name: "Joe", games: 0, available: true },
+            { name: "John", games: 0, available: true },
+            { name: "John Kim", games: 0, available: true },
+            { name: "Jon", games: 0, available: true },
+            { name: "Josh", games: 0, available: true },
+            { name: "Jt", games: 0, available: true },
+            { name: "Justin", games: 0, available: true },
+            { name: "Kevin King", games: 0, available: true },
+            { name: "KevinBookher", games: 0, available: true },
+            { name: "Kyth Trieu", games: 0, available: true },
+            { name: "Li", games: 0, available: true },
+            { name: "Otari Kobiashbili", games: 0, available: true },
+            { name: "Paul Lee", games: 0, available: true },
+            { name: "Rashan", games: 0, available: true },
+            { name: "Ray Wong", games: 0, available: true },
+            { name: "Ricky Vien", games: 0, available: true },
+            { name: "RJ", games: 0, available: true },
+            { name: "Steve", games: 0, available: true },
+            { name: "Tasso", games: 0, available: true },
+            { name: "Timothy Kim", games: 0, available: true },
+            { name: "Todd", games: 0, available: true },
+            { name: "Tony Ng", games: 0, available: true }
+        ];
+
+        const sunday = [
+            { name: "Adrian", games: 0, available: true },
+            { name: "Alex", games: 0, available: true },
+            { name: "Andy Wang", games: 0, available: true },
+            { name: "Angel", games: 0, available: true },
+            { name: "Angel Jr", games: 0, available: true },
+            { name: "Bill", games: 0, available: true },
+            { name: "Daniel Bernatowicz", games: 0, available: true },
+            { name: "Danny", games: 0, available: true },
+            { name: "Dofu", games: 0, available: true },
+            { name: "Don Chin", games: 0, available: true },
+            { name: "Dong", games: 0, available: true },
+            { name: "Edwin", games: 0, available: true },
+            { name: "Eugene", games: 0, available: true },
+            { name: "Jack Chin", games: 0, available: true },
+            { name: "James Chan", games: 0, available: true },
+            { name: "Jay Li", games: 0, available: true },
+            { name: "John", games: 0, available: true },
+            { name: "Kasing Lam", games: 0, available: true },
+            { name: "Kent Zhou", games: 0, available: true },
+            { name: "Kyo Chan", games: 0, available: true },
+            { name: "Mark Chan", games: 0, available: true },
+            { name: "Matthew To", games: 0, available: true },
+            { name: "Mike", games: 0, available: true },
+            { name: "Ray T", games: 0, available: true },
+            { name: "Randy", games: 0, available: true },
+            { name: "Sit Wong", games: 0, available: true },
+            { name: "Waiho", games: 0, available: true },
+            { name: "Wing", games: 0, available: true },
+            { name: "Yili Huang", games: 0, available: true },
+            { name: "Zai Zai", games: 0, available: true },
+            { name: "梁光远", games: 0, available: true }
+        ].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
+
+        const stelton = [
+            { name: "Adi", games: 0, available: true },
+            { name: "Ben", games: 0, available: true },
+            { name: "Brent", games: 0, available: true },
+            { name: "Chad", games: 0, available: true },
+            { name: "Dan", games: 0, available: true },
+            { name: "Danny", games: 0, available: true },
+            { name: "Devin", games: 0, available: true },
+            { name: "Ed", games: 0, available: true },
+            { name: "Giles", games: 0, available: true },
+            { name: "Houdine", games: 0, available: true },
+            { name: "Joe", games: 0, available: true },
+            { name: "Joel", games: 0, available: true },
+            { name: "Joey", games: 0, available: true },
+            { name: "Jose", games: 0, available: true },
+            { name: "Keith", games: 0, available: true },
+            { name: "Malik", games: 0, available: true },
+            { name: "Marshall", games: 0, available: true },
+            { name: "Matt", games: 0, available: true },
+            { name: "Mike", games: 0, available: true },
+            { name: "Mike Jr", games: 0, available: true },
+            { name: "Pat Lawrence", games: 0, available: true },
+            { name: "Pat Liang", games: 0, available: true },
+            { name: "Phil", games: 0, available: true },
+            { name: "Rafi", games: 0, available: true },
+            { name: "Scott", games: 0, available: true },
+            { name: "Steve Braunstein", games: 0, available: true },
+            { name: "Steve Vlaun", games: 0, available: true },
+            { name: "Troy", games: 0, available: true },
+            { name: "Valeriy", games: 0, available: true }
+        ];
+
+        // Force initialization to custom roster (empty) on refresh
+        let players = empty.map(p => ({ ...p }));
+
+        let pendingTeamBlackIndices = [];
+        let pendingTeamWhiteIndices = [];
+        let lastGameIndices = [];
+
+        function switchRoster() {
+            const selectedRoster = document.getElementById('rosterSelect').value;
+            let sourceList = empty;
+            if (selectedRoster === 'monday') sourceList = monday;
+            if (selectedRoster === 'thursday') sourceList = thursday;
+            if (selectedRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
+            if (selectedRoster === 'saturday') sourceList = saturday;
+            if (selectedRoster === 'sunday') sourceList = sunday;
+            if (selectedRoster === 'stelton') sourceList = stelton;
+            
+            players = sourceList.map(p => ({ ...p }));
+            lastGameIndices = [];
+            pendingTeamBlackIndices = [];
+            pendingTeamWhiteIndices = [];
+            document.getElementById('outputCard').style.display = 'none';
+            hideAlert();
+            renderPlayerList();
+        }
+
+        function showAlert(message) {
+            const alertBox = document.getElementById('customAlert');
+            const alertMsg = document.getElementById('customAlertMsg');
+            alertMsg.textContent = message;
+            alertBox.style.display = 'flex';
+        }
+
+        function hideAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+
+        function updatePlayerCounts() {
+            let total = players.length;
+            let availableCount = players.filter(p => p.available).length;
+            document.getElementById('playerCountDisplay').textContent = `Available: ${availableCount} / ${total}`;
+            
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (total > 0 && availableCount === total) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else if (availableCount === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        function renderPlayerList() {
+            const container = document.getElementById('playerContainer');
+            container.innerHTML = '';
+
+            let headerDiv = document.createElement('div');
+            headerDiv.className = 'list-header';
+            headerDiv.innerHTML = `<span>Player Name</span><span>Games Played</span>`;
+            container.appendChild(headerDiv);
+
+            players.forEach((p, index) => {
+                let div = document.createElement('div');
+                div.className = 'player-item';
+
+                let leftGroup = document.createElement('div');
+                leftGroup.className = 'player-left-group';
+
+                let availableCheckbox = document.createElement('input');
+                availableCheckbox.type = 'checkbox';
+                availableCheckbox.checked = p.available;
+                availableCheckbox.id = 'available_' + index;
+                availableCheckbox.onchange = function() { toggleAvailable(index, availableCheckbox.checked); };
+
+                let infoDiv = document.createElement('div');
+                infoDiv.className = 'player-info';
+
+                let label = document.createElement('label');
+                label.htmlFor = 'available_' + index;
+                label.textContent = p.name;
+                label.style.cursor = 'pointer';
+                if (!p.available) {
+                    label.style.color = '#888';
+                }
+
+                infoDiv.appendChild(availableCheckbox);
+                infoDiv.appendChild(label);
+                leftGroup.appendChild(infoDiv);
+
+                let actionsDiv = document.createElement('div');
+                actionsDiv.style.display = 'flex';
+                actionsDiv.style.alignItems = 'center';
+                actionsDiv.style.gap = '8px';
+
+                let badge = document.createElement('span');
+                badge.className = 'stats-badge';
+                badge.textContent = p.games;
+
+                let counterDiv = document.createElement('div');
+                counterDiv.className = 'counter-controls';
+
+                let minusBtn = document.createElement('button');
+                minusBtn.textContent = '-';
+                minusBtn.className = 'counter-btn';
+                minusBtn.onclick = function() { adjustGames(index, -1); };
+
+                let plusBtn = document.createElement('button');
+                plusBtn.textContent = '+';
+                plusBtn.className = 'counter-btn';
+                plusBtn.onclick = function() { adjustGames(index, 1); };
+
+                counterDiv.appendChild(minusBtn);
+                counterDiv.appendChild(plusBtn);
+
+                actionsDiv.appendChild(badge);
+                actionsDiv.appendChild(counterDiv);
+
+                div.appendChild(leftGroup);
+                div.appendChild(actionsDiv);
+                container.appendChild(div);
+            });
+
+            updatePlayerCounts();
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('newPlayerName');
+            const name = input.value.trim();
+            if (name !== "") {
+                players.push({ name: name, games: 0, available: true });
+                input.value = '';
+                hideAlert();
+                renderPlayerList();
+            }
+        }
+
+        function removeAllPlayers() {
+            players = [];
+            lastGameIndices = [];
+            pendingTeamBlackIndices = [];
+            pendingTeamWhiteIndices = [];
+            document.getElementById('outputCard').style.display = 'none';
+            hideAlert();
+            renderPlayerList();
+        }
+
+        function toggleAvailable(index, isAvailable) {
+            players[index].available = isAvailable;
+            updatePlayerCounts();
+            
+            const label = document.querySelector(`label[for="available_${index}"]`);
+            if (label) {
+                label.style.color = isAvailable ? '#000' : '#888';
+            }
+        }
+
+        function toggleSelectAll(isChecked) {
+            players.forEach(p => {
+                p.available = isChecked;
+            });
+            renderPlayerList();
+        }
+
+        function adjustGames(index, amount) {
+            players[index].games += amount;
+            if (players[index].games < 0) {
+                players[index].games = 0;
+            }
+            renderPlayerList();
+        }
+
+        function resetTracker() {
+            players.forEach(p => {
+                p.games = 0;
+                p.available = true;
+            });
+            lastGameIndices = [];
+            pendingTeamBlackIndices = [];
+            pendingTeamWhiteIndices = [];
+            document.getElementById('outputCard').style.display = 'none';
+            hideAlert();
+            renderPlayerList();
+        }
+
+        function generateTeams() {
+            hideAlert();
+            let perTeamInput = parseInt(document.getElementById('playersPerTeamInput').value);
+            if (isNaN(perTeamInput) || perTeamInput < 1) {
+                showAlert("Please enter a valid number of players per team!");
+                return;
+            }
+
+            let selectedIndices = [];
+            players.forEach((p, index) => {
+                if (p.available) {
+                    selectedIndices.push(index);
+                }
+            });
+
+            let requiredTotal = perTeamInput * 2;
+            if (selectedIndices.length < requiredTotal) {
+                showAlert(`Please select at least ${requiredTotal} available players to form two ${perTeamInput}-player teams!`);
+                return;
+            }
+
+            selectedIndices.sort((a, b) => {
+                let aPlayedLast = lastGameIndices.includes(a) ? 1 : 0;
+                let bPlayedLast = lastGameIndices.includes(b) ? 1 : 0;
+                if (aPlayedLast !== bPlayedLast) {
+                    return aPlayedLast - bPlayedLast;
+                }
+
+                return players[a].games - players[b].games;
+            });
+
+            let groupedMap = {};
+            selectedIndices.forEach(i => {
+                let playedLast = lastGameIndices.includes(i) ? 1 : 0;
+                let totalGames = players[i].games;
+                let key = `${playedLast}_${totalGames}`;
+
+                if (!groupedMap[key]) groupedMap[key] = [];
+                groupedMap[key].push(i);
+            });
+
+            let prioritizedIndices = [];
+            Object.keys(groupedMap).sort().forEach(key => {
+                let group = groupedMap[key];
+                group.sort(() => Math.random() - 0.5);
+                prioritizedIndices.push(...group);
+            });
+
+            let totalNeeded = perTeamInput * 2;
+            let chosenPlayers = prioritizedIndices.slice(0, totalNeeded);
+            chosenPlayers.sort(() => Math.random() - 0.5);
+
+            pendingTeamBlackIndices = chosenPlayers.slice(0, perTeamInput);
+            pendingTeamWhiteIndices = chosenPlayers.slice(perTeamInput, totalNeeded);
+
+            const teamBlackList = document.getElementById('teamBlackList');
+            const teamWhiteList = document.getElementById('teamWhiteList');
+            
+            teamBlackList.innerHTML = '';
+            teamWhiteList.innerHTML = '';
+
+            pendingTeamBlackIndices.forEach(i => {
+                let li = document.createElement('li');
+                li.textContent = players[i].name;
+                teamBlackList.appendChild(li);
+            });
+
+            pendingTeamWhiteIndices.forEach(i => {
+                let li = document.createElement('li');
+                li.textContent = players[i].name;
+                teamWhiteList.appendChild(li);
+            });
+
+            const acceptBtn = document.getElementById('acceptBtn');
+            acceptBtn.disabled = false;
+            acceptBtn.textContent = "Accept Teams & Update Games Played";
+
+            document.getElementById('outputCard').style.display = 'block';
+        }
+
+        function acceptLineup() {
+            let currentSelectedTeam = [...pendingTeamBlackIndices, ...pendingTeamWhiteIndices];
+
+            players.forEach((p, i) => {
+                if (p.available) {
+                    if (currentSelectedTeam.includes(i)) {
+                        p.games++;
+                    }
+                }
+            });
+
+            lastGameIndices = currentSelectedTeam;
+            renderPlayerList();
+
+            const acceptBtn = document.getElementById('acceptBtn');
+            acceptBtn.disabled = true;
+            acceptBtn.textContent = "Accept Teams & Update Games Played";
+        }
+
+        // Enforce dropdown selection sync on load
+        document.getElementById('rosterSelect').value = 'empty';
+        renderPlayerList();
+    </script>
+
+</body>
+</html>
