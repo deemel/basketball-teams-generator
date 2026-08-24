@@ -227,6 +227,18 @@
             padding: 0 5px;
             cursor: pointer;
         }
+        .history-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .history-item h4 {
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -294,6 +306,12 @@
         </div>
         <!-- Accept Teams Button -->
         <button id="acceptBtn" class="accept-btn" onclick="acceptLineup()">Accept Teams & Update Games Played</button>
+    </div>
+
+    <!-- Games Played History -->
+    <div class="card" id="historyCard" style="display:none;">
+        <h2>Games Played History</h2>
+        <div id="historyContainer"></div>
     </div>
 
     <script>
@@ -522,6 +540,7 @@
         let pendingTeam1Indices = [];
         let pendingTeam2Indices = [];
         let lastGameIndices = [];
+        let gamesHistory = [];
 
         function switchRoster() {
             const selectedRoster = document.getElementById('rosterSelect').value;
@@ -537,9 +556,12 @@
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
+            gamesHistory = [];
             
             document.getElementById('playersPerTeamInput').value = 5;
             document.getElementById('outputCard').style.display = 'none';
+            document.getElementById('historyCard').style.display = 'none';
+            document.getElementById('historyContainer').innerHTML = '';
             hideAlert();
             renderPlayerList();
 
@@ -716,8 +738,11 @@
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
+            gamesHistory = [];
             document.getElementById('playersPerTeamInput').value = 5;
             document.getElementById('outputCard').style.display = 'none';
+            document.getElementById('historyCard').style.display = 'none';
+            document.getElementById('historyContainer').innerHTML = '';
             hideAlert();
             renderPlayerList();
 
@@ -821,9 +846,72 @@
             lastGameIndices = currentSelectedTeam;
             renderPlayerList();
 
+            // Add to games history
+            let team1Names = pendingTeam1Indices.map(i => players[i].name);
+            let team2Names = pendingTeam2Indices.map(i => players[i].name);
+            gamesHistory.push({ team1: team1Names, team2: team2Names });
+            renderHistory();
+
             const acceptBtn = document.getElementById('acceptBtn');
             acceptBtn.disabled = true;
             acceptBtn.textContent = "Accept Teams & Update Games Played";
+        }
+
+        function renderHistory() {
+            const historyContainer = document.getElementById('historyContainer');
+            const historyCard = document.getElementById('historyCard');
+            historyContainer.innerHTML = '';
+
+            if (gamesHistory.length === 0) {
+                historyCard.style.display = 'none';
+                return;
+            }
+
+            historyCard.style.display = 'block';
+
+            gamesHistory.forEach((game, index) => {
+                let gameDiv = document.createElement('div');
+                gameDiv.className = 'history-item';
+
+                let title = document.createElement('h4');
+                title.textContent = `Game ${index + 1}`;
+                gameDiv.appendChild(title);
+
+                let teamsContainer = document.createElement('div');
+                teamsContainer.className = 'teams-container';
+
+                let team1Div = document.createElement('div');
+                team1Div.className = 'team';
+                let t1Heading = document.createElement('h3');
+                t1Heading.textContent = 'Team 1';
+                let t1Ol = document.createElement('ol');
+                game.team1.forEach(name => {
+                    let li = document.createElement('li');
+                    li.textContent = name;
+                    t1Ol.appendChild(li);
+                });
+                team1Div.appendChild(t1Heading);
+                team1Div.appendChild(t1Ol);
+
+                let team2Div = document.createElement('div');
+                team2Div.className = 'team';
+                let t2Heading = document.createElement('h3');
+                t2Heading.textContent = 'Team 2';
+                let t2Ol = document.createElement('ol');
+                game.team2.forEach(name => {
+                    let li = document.createElement('li');
+                    li.textContent = name;
+                    t2Ol.appendChild(li);
+                });
+                team2Div.appendChild(t2Heading);
+                team2Div.appendChild(t2Ol);
+
+                teamsContainer.appendChild(team1Div);
+                teamsContainer.appendChild(team2Div);
+                gameDiv.appendChild(teamsContainer);
+
+                historyContainer.appendChild(gameDiv);
+            });
         }
 
         document.getElementById('rosterSelect').value = 'empty';
