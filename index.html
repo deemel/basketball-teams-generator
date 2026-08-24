@@ -542,6 +542,11 @@
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
+
+            const container = document.getElementById('playerContainer');
+            if (container) {
+                container.scrollTop = 0;
+            }
         }
 
         function showAlert(message) {
@@ -715,6 +720,11 @@
             document.getElementById('outputCard').style.display = 'none';
             hideAlert();
             renderPlayerList();
+
+            const container = document.getElementById('playerContainer');
+            if (container) {
+                container.scrollTop = 0;
+            }
         }
 
         function generateTeams() {
