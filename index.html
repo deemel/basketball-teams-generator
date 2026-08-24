@@ -234,10 +234,21 @@
             padding: 12px;
             margin-bottom: 12px;
         }
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
         .history-item h4 {
-            margin: 0 0 8px 0;
+            margin: 0;
             font-size: 1rem;
             color: #333;
+        }
+        .history-timestamp {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -846,10 +857,11 @@
             lastGameIndices = currentSelectedTeam;
             renderPlayerList();
 
-            // Add to games history
+            // Add to games history with current date and time timestamp
             let team1Names = pendingTeam1Indices.map(i => players[i].name);
             let team2Names = pendingTeam2Indices.map(i => players[i].name);
-            gamesHistory.push({ team1: team1Names, team2: team2Names });
+            let timestamp = new Date().toLocaleString();
+            gamesHistory.push({ team1: team1Names, team2: team2Names, timestamp: timestamp });
             renderHistory();
 
             const acceptBtn = document.getElementById('acceptBtn');
@@ -873,9 +885,19 @@
                 let gameDiv = document.createElement('div');
                 gameDiv.className = 'history-item';
 
+                let headerDiv = document.createElement('div');
+                headerDiv.className = 'history-item-header';
+
                 let title = document.createElement('h4');
                 title.textContent = `Game ${index + 1}`;
-                gameDiv.appendChild(title);
+
+                let timeSpan = document.createElement('span');
+                timeSpan.className = 'history-timestamp';
+                timeSpan.textContent = game.timestamp;
+
+                headerDiv.appendChild(title);
+                headerDiv.appendChild(timeSpan);
+                gameDiv.appendChild(headerDiv);
 
                 let teamsContainer = document.createElement('div');
                 teamsContainer.className = 'teams-container';
