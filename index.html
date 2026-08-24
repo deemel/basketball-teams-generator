@@ -250,6 +250,18 @@
             color: #666;
             font-weight: normal;
         }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -553,28 +565,62 @@
         let lastGameIndices = [];
         let gamesHistory = [];
 
+        function saveToLocalStorage() {
+            const currentRoster = document.getElementById('rosterSelect').value;
+            const state = {
+                roster: currentRoster,
+                players: players,
+                gamesHistory: gamesHistory,
+                lastGameIndices: lastGameIndices
+            };
+            localStorage.setItem('teams_tracker_state_' + currentRoster, JSON.stringify(state));
+            localStorage.setItem('teams_tracker_last_roster', currentRoster);
+        }
+
+        function loadFromLocalStorage(rosterKey) {
+            const savedState = localStorage.getItem('teams_tracker_state_' + rosterKey);
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    players = parsed.players || [];
+                    gamesHistory = parsed.gamesHistory || [];
+                    lastGameIndices = parsed.lastGameIndices || [];
+                    return true;
+                } catch (e) {
+                    console.error("Failed to parse stored state:", e);
+                }
+            }
+            return false;
+        }
+
         function switchRoster() {
             const selectedRoster = document.getElementById('rosterSelect').value;
-            let sourceList = empty;
-            if (selectedRoster === 'monday') sourceList = monday;
-            if (selectedRoster === 'thursday') sourceList = thursday;
-            if (selectedRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
-            if (selectedRoster === 'saturday') sourceList = saturday;
-            if (selectedRoster === 'sunday') sourceList = sunday;
-            if (selectedRoster === 'stelton') sourceList = stelton;
-            
-            players = sourceList.map(p => ({ ...p }));
-            lastGameIndices = [];
+            let loaded = loadFromLocalStorage(selectedRoster);
+
+            if (!loaded) {
+                let sourceList = empty;
+                if (selectedRoster === 'monday') sourceList = monday;
+                if (selectedRoster === 'thursday') sourceList = thursday;
+                if (selectedRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
+                if (selectedRoster === 'saturday') sourceList = saturday;
+                if (selectedRoster === 'sunday') sourceList = sunday;
+                if (selectedRoster === 'stelton') sourceList = stelton;
+                
+                players = sourceList.map(p => ({ ...p }));
+                lastGameIndices = [];
+                gamesHistory = [];
+            }
+
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
-            gamesHistory = [];
             
             document.getElementById('playersPerTeamInput').value = 5;
             document.getElementById('outputCard').style.display = 'none';
-            document.getElementById('historyCard').style.display = 'none';
-            document.getElementById('historyContainer').innerHTML = '';
+            
             hideAlert();
             renderPlayerList();
+            renderHistory();
+            saveToLocalStorage();
 
             const container = document.getElementById('playerContainer');
             if (container) {
@@ -713,6 +759,7 @@
                 input.value = '';
                 hideAlert();
                 renderPlayerList();
+                saveToLocalStorage();
             }
         }
 
@@ -724,6 +771,7 @@
             if (label) {
                 label.style.color = isAvailable ? '#000' : '#888';
             }
+            saveToLocalStorage();
         }
 
         function toggleSelectAll(isChecked) {
@@ -731,6 +779,7 @@
                 p.available = isChecked;
             });
             renderPlayerList();
+            saveToLocalStorage();
         }
 
         function adjustGames(index, amount) {
@@ -739,6 +788,7 @@
                 players[index].games = 0;
             }
             renderPlayerList();
+            saveToLocalStorage();
         }
 
         function resetTracker() {
@@ -756,6 +806,7 @@
             document.getElementById('historyContainer').innerHTML = '';
             hideAlert();
             renderPlayerList();
+            saveToLocalStorage();
 
             const container = document.getElementById('playerContainer');
             if (container) {
@@ -863,10 +914,42 @@
             let timestamp = new Date().toLocaleString();
             gamesHistory.push({ team1: team1Names, team2: team2Names, timestamp: timestamp });
             renderHistory();
+            saveToLocalStorage();
 
             const acceptBtn = document.getElementById('acceptBtn');
             acceptBtn.disabled = true;
             acceptBtn.textContent = "Accept Teams & Update Games Played";
+        }
+
+        function deleteGame(historyIndex) {
+            let game = gamesHistory[historyIndex];
+            
+            // Decrement game count for players who were in this game entry
+            let allPlayerNames = [...game.team1, ...game.team2];
+            allPlayerNames.forEach(name => {
+                let player = players.find(p => p.name === name);
+                if (player && player.games > 0) {
+                    player.games--;
+                }
+            });
+
+            // Remove game entry from history
+            gamesHistory.splice(historyIndex, 1);
+
+            // Update lastGameIndices to reflect previous game or clear if empty
+            if (gamesHistory.length > 0) {
+                let lastGame = gamesHistory[gamesHistory.length - 1];
+                let lastGameNames = [...lastGame.team1, ...lastGame.team2];
+                lastGameIndices = players
+                    .map((p, idx) => lastGameNames.includes(p.name) ? idx : -1)
+                    .filter(idx => idx !== -1);
+            } else {
+                lastGameIndices = [];
+            }
+
+            renderPlayerList();
+            renderHistory();
+            saveToLocalStorage();
         }
 
         function renderHistory() {
@@ -891,12 +974,25 @@
                 let title = document.createElement('h4');
                 title.textContent = `Game ${index + 1}`;
 
+                let headerRight = document.createElement('div');
+                headerRight.style.display = 'flex';
+                headerRight.style.alignItems = 'center';
+                headerRight.style.gap = '10px';
+
                 let timeSpan = document.createElement('span');
                 timeSpan.className = 'history-timestamp';
                 timeSpan.textContent = game.timestamp;
 
+                let deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = function() { deleteGame(index); };
+
+                headerRight.appendChild(timeSpan);
+                headerRight.appendChild(deleteBtn);
+
                 headerDiv.appendChild(title);
-                headerDiv.appendChild(timeSpan);
+                headerDiv.appendChild(headerRight);
                 gameDiv.appendChild(headerDiv);
 
                 let teamsContainer = document.createElement('div');
@@ -936,8 +1032,10 @@
             });
         }
 
-        document.getElementById('rosterSelect').value = 'empty';
-        renderPlayerList();
+        // Initialize state on page load
+        const lastRoster = localStorage.getItem('teams_tracker_last_roster') || 'empty';
+        document.getElementById('rosterSelect').value = lastRoster;
+        switchRoster();
     </script>
 
 </body>
