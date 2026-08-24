@@ -10,3 +10,4 @@ Here is a summary of its key features:
 - Live Games Tracker: Keeps a running tally of how many games each player has participated in during the session, with manual + and - adjustment buttons for corrections.
 - Games Played History: Logs all accepted game matchups (Team 1 vs. Team 2) sequentially at the bottom of the page.
 - Mobile-Friendly Design: Optimized with responsive layouts, touch-friendly buttons, and flexible stacking containers so it works seamlessly on smartphones and tablets.
+- Persistent Data Storage: Automatic save/restore of rosters, players, games played, player availability statuses, roster selection, and game histories across sessions.
