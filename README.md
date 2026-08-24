@@ -8,4 +8,5 @@ Here is a summary of its key features:
   - Rotation: Prioritizes players who sat out or didn't play in the previous game over those who just played.
   - Randomization: Randomly selects among players tied in stats to keep matchups fresh.
 - Live Games Tracker: Keeps a running tally of how many games each player has participated in during the session, with manual + and - adjustment buttons for corrections.
+- Games Played History: Logs all accepted game matchups (Team 1 vs. Team 2) sequentially at the bottom of the page.
 - Mobile-Friendly Design: Optimized with responsive layouts, touch-friendly buttons, and flexible stacking containers so it works seamlessly on smartphones and tablets.
