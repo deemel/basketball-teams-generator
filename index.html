@@ -790,10 +790,18 @@
         }
 
         function resetTracker() {
-            players.forEach(p => {
-                p.games = 0;
-                p.available = true;
-            });
+            const currentRoster = document.getElementById('rosterSelect').value;
+            localStorage.removeItem('teams_tracker_state_' + currentRoster);
+
+            let sourceList = empty;
+            if (currentRoster === 'monday') sourceList = monday;
+            if (currentRoster === 'thursday') sourceList = thursday;
+            if (currentRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
+            if (currentRoster === 'saturday') sourceList = saturday;
+            if (currentRoster === 'sunday') sourceList = sunday;
+            if (currentRoster === 'stelton') sourceList = stelton;
+
+            players = sourceList.map(p => ({ ...p }));
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
@@ -804,7 +812,6 @@
             document.getElementById('historyContainer').innerHTML = '';
             hideAlert();
             renderPlayerList();
-            saveToLocalStorage();
 
             const container = document.getElementById('playerContainer');
             if (container) {
