@@ -834,26 +834,36 @@
                 return;
             }
 
-            selectedIndices.sort((a, b) => {
-                let aPlayedLast = lastGameIndices.includes(a) ? 1 : 0;
-                let bPlayedLast = lastGameIndices.includes(b) ? 1 : 0;
-                if (aPlayedLast !== bPlayedLast) {
-                    return aPlayedLast - bPlayedLast;
+            // Helper to calculate consecutive games played up to the current state
+            function getConsecutiveGamesPlayed(playerIndex) {
+                let count = 0;
+                let playerName = players[playerIndex].name;
+                
+                for (let i = gamesHistory.length - 1; i >= 0; i--) {
+                    let game = gamesHistory[i];
+                    let playedInGame = game.team1.includes(playerName) || game.team2.includes(playerName);
+                    
+                    if (playedInGame) {
+                        count++;
+                    } else {
+                        break;
+                    }
                 }
+                return count;
+            }
 
-                return players[a].games - players[b].games;
-            });
-
+            // Group players by consecutive_games_played + total_games_played
             let groupedMap = {};
             selectedIndices.forEach(i => {
-                let playedLast = lastGameIndices.includes(i) ? 1 : 0;
+                let consecutiveCount = getConsecutiveGamesPlayed(i);
                 let totalGames = players[i].games;
-                let key = `${playedLast}_${totalGames}`;
+                let key = `${String(consecutiveCount).padStart(4, '0')}_${String(totalGames).padStart(4, '0')}`;
 
                 if (!groupedMap[key]) groupedMap[key] = [];
                 groupedMap[key].push(i);
             });
 
+            // Shuffle within identical priority tiers
             let prioritizedIndices = [];
             Object.keys(groupedMap).sort().forEach(key => {
                 let group = groupedMap[key];
