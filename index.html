@@ -891,7 +891,7 @@
             }
         }
 
-        function generateTeams() {
+        function generateTeams0() {
             hideAlert();
             let perTeamInput = parseInt(document.getElementById('playersPerTeamInput').value);
             if (isNaN(perTeamInput) || perTeamInput < 1) {
@@ -963,6 +963,119 @@
             const team1List = document.getElementById('team1List');
             const team2List = document.getElementById('team2List');
             
+            team1List.innerHTML = '';
+            team2List.innerHTML = '';
+
+            pendingTeam1Indices.forEach(i => {
+                let li = document.createElement('li');
+                li.textContent = players[i].name;
+                team1List.appendChild(li);
+            });
+
+            pendingTeam2Indices.forEach(i => {
+                let li = document.createElement('li');
+                li.textContent = players[i].name;
+                team2List.appendChild(li);
+            });
+
+            const acceptBtn = document.getElementById('acceptBtn');
+            acceptBtn.disabled = false;
+            acceptBtn.textContent = "Accept Teams & Update Games Played";
+
+            document.getElementById('outputCard').style.display = 'block';
+        }
+
+        function generateTeams() {
+            hideAlert();
+    
+            // 1. Read input configuration
+            let perTeamInput = parseInt(document.getElementById('playersPerTeamInput').value);
+            if (isNaN(perTeamInput) || perTeamInput < 1) {
+                showAlert("Please enter a valid number of players per team!");
+                return;
+            }
+
+            // 2. Filter for available players
+            let selectedIndices = [];
+            players.forEach((p, index) => {
+                if (p.available) {
+                    selectedIndices.push(index);
+                }
+            });
+
+            let requiredTotal = perTeamInput * 2;
+            if (selectedIndices.length < requiredTotal) {
+                showAlert(`Please select at least ${requiredTotal} available players to form two ${perTeamInput}-player teams!`);
+                return;
+            }
+
+            /**
+             * Streak Score Helper:
+             * - Returns a NEGATIVE number for consecutive games SAT OUT (e.g., -2 = sat out 2 straight games).
+             * - Returns a POSITIVE number for consecutive games PLAYED (e.g., +2 = played 2 straight games).
+             * - Returns 0 if no games have been recorded yet.
+             */
+            function getStreakScore(playerIndex) {
+                let playerName = players[playerIndex].name;
+                if (gamesHistory.length === 0) return 0;
+
+                // Check last game played state
+                let lastGame = gamesHistory[gamesHistory.length - 1];
+                let playedLast = lastGame.team1.includes(playerName) || lastGame.team2.includes(playerName);
+
+                let streak = 0;
+                for (let i = gamesHistory.length - 1; i >= 0; i--) {
+                    let game = gamesHistory[i];
+                    let playedInGame = game.team1.includes(playerName) || game.team2.includes(playerName);
+
+                    if (playedInGame === playedLast) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+
+                return playedLast ? streak : -streak;
+            }
+
+            // 3. Group players by their exact streak score
+            let groupedMap = {};
+            selectedIndices.forEach(i => {
+                let score = getStreakScore(i);
+                if (!groupedMap[score]) groupedMap[score] = [];
+                groupedMap[score].push(i);
+            });
+
+            // 4. Sort groups ascending (most negative scores first = highest priority)
+            let prioritizedIndices = [];
+            Object.keys(groupedMap)
+                .map(Number)
+                .sort((a, b) => a - b)
+                .forEach(score => {
+                    let group = groupedMap[score];
+                    // Randomize ties within the same streak tier
+                    group.sort(() => Math.random() - 0.5);
+                    prioritizedIndices.push(...group);
+                });
+
+            // 5. Select the top required players and split into teams
+            let totalNeeded = perTeamInput * 2;
+            let chosenPlayers = prioritizedIndices.slice(0, totalNeeded);
+    
+            // Randomly divide chosen players between Team 1 and Team 2
+            chosenPlayers.sort(() => Math.random() - 0.5);
+
+            pendingTeam1Indices = chosenPlayers.slice(0, perTeamInput);
+            pendingTeam2Indices = chosenPlayers.slice(perTeamInput, totalNeeded);
+
+            // Sort players alphabetically for visual presentation
+            pendingTeam1Indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
+            pendingTeam2Indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
+
+            // 6. Update UI
+            const team1List = document.getElementById('team1List');
+            const team2List = document.getElementById('team2List');
+    
             team1List.innerHTML = '';
             team2List.innerHTML = '';
 
