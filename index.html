@@ -878,6 +878,10 @@
             pendingTeam1Indices = chosenPlayers.slice(0, perTeamInput);
             pendingTeam2Indices = chosenPlayers.slice(perTeamInput, totalNeeded);
 
+            // Sort team arrays alphabetically by player name
+            pendingTeam1Indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
+            pendingTeam2Indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
+
             const team1List = document.getElementById('team1List');
             const team2List = document.getElementById('team2List');
             
