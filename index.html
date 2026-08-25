@@ -826,14 +826,24 @@
         }
 
         function toggleCheckedIn(index, isCheckedIn) {
-            players[index].checkedIn = isCheckedIn;
-
             if (isCheckedIn) {
-                // Check available status & record timestamp
+                // Calculate current average games played across all checked-in players
+                const checkedInPlayers = players.filter(p => p.checkedIn);
+                if (checkedInPlayers.length > 0) {
+                    const totalGames = checkedInPlayers.reduce((sum, p) => sum + p.games, 0);
+                    const avgGames = Math.floor(totalGames / checkedInPlayers.length);
+                    
+                    // Set player's games to floor average if checking in for the first time (games == 0)
+                    if (players[index].games === 0) {
+                        players[index].games = avgGames;
+                    }
+                }
+
+                players[index].checkedIn = true;
                 players[index].available = true;
                 players[index].checkInTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             } else {
-                // Uncheck available status & clear timestamp
+                players[index].checkedIn = false;
                 players[index].available = false;
                 players[index].checkInTime = null;
             }
