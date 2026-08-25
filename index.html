@@ -128,6 +128,20 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+        }
+        .header-center-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1;
+        }
+        .header-right-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+            flex: 1;
         }
         .player-item {
             display: flex;
@@ -141,6 +155,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+        }
+        .player-center-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 6px;
+            flex: 1;
+        }
+        .player-right-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+            flex: 1;
         }
         .player-info {
             display: flex;
@@ -149,6 +178,11 @@
         }
         .player-item input[type="checkbox"] {
             transform: scale(1.2);
+        }
+        .checkin-time {
+            font-size: 0.75rem;
+            color: #28a745;
+            font-weight: bold;
         }
         .stats-badge {
             background: #eef2f7;
@@ -341,220 +375,220 @@
         const empty = [];
 
         const monday = [
-            { name: "Ah B", games: 0, available: false },
-            { name: "Alex", games: 0, available: false },
-            { name: "Aric", games: 0, available: false },
-            { name: "Benny", games: 0, available: false },
-            { name: "Billy", games: 0, available: false },
-            { name: "Brian", games: 0, available: false },
-            { name: "Chris", games: 0, available: false },
-            { name: "Danny", games: 0, available: false },
-            { name: "Deric", games: 0, available: false },
-            { name: "Eric", games: 0, available: false },
-            { name: "Fai", games: 0, available: false },
-            { name: "Francis", games: 0, available: false },
-            { name: "Howard", games: 0, available: false },
-            { name: "Jeffrey", games: 0, available: false },
-            { name: "Joe", games: 0, available: false },
-            { name: "Kelvin", games: 0, available: false },
-            { name: "Kenji", games: 0, available: false },
-            { name: "Kenneth", games: 0, available: false },
-            { name: "Kit", games: 0, available: false },
-            { name: "Kobe", games: 0, available: false },
-            { name: "Kyth", games: 0, available: false },
-            { name: "Lok", games: 0, available: false },
-            { name: "Pat", games: 0, available: false },
-            { name: "Raymond", games: 0, available: false },
-            { name: "Ricky", games: 0, available: false },
-            { name: "Sunny", games: 0, available: false },
-            { name: "Timmy", games: 0, available: false },
-            { name: "Travis", games: 0, available: false },
-            { name: "Wayne", games: 0, available: false },
-            { name: "奶仔", games: 0, available: false },
-            { name: "蔡哥", games: 0, available: false }
+            { name: "Ah B", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Alex", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Aric", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Benny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Billy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Brian", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Chris", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Deric", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eric", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Fai", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Francis", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Howard", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jeffrey", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Joe", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kelvin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kenji", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kenneth", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kit", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kobe", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kyth", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Lok", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Pat", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Raymond", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ricky", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Sunny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Timmy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Travis", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Wayne", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "奶仔", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "蔡哥", games: 0, available: false, checkedIn: false, checkInTime: null }
         ];
 
         const thursday = [
-            { name: "Benny", games: 0, available: false },
-            { name: "Bing", games: 0, available: false },
-            { name: "Dan Lau", games: 0, available: false },
-            { name: "Danny", games: 0, available: false },
-            { name: "George", games: 0, available: false },
-            { name: "Giles", games: 0, available: false },
-            { name: "Jack", games: 0, available: false },
-            { name: "James", games: 0, available: false },
-            { name: "Jay", games: 0, available: false },
-            { name: "Kenny", games: 0, available: false },
-            { name: "Kok Kit Lee", games: 0, available: false },
-            { name: "Kwok", games: 0, available: false },
-            { name: "Michael Leung", games: 0, available: false },
-            { name: "Michael Poon", games: 0, available: false },
-            { name: "Nelson", games: 0, available: false },
-            { name: "Paul", games: 0, available: false },
-            { name: "Peter", games: 0, available: false },
-            { name: "Phil", games: 0, available: false },
-            { name: "Steve", games: 0, available: false },
-            { name: "Tony", games: 0, available: false },
-            { name: "Wai Yip Lee", games: 0, available: false },
-            { name: "William", games: 0, available: false },
-            { name: "二少", games: 0, available: false },
-            { name: "建哥", games: 0, available: false },
-            { name: "梁光远", games: 0, available: false },
-            { name: "韓家聲", games: 0, available: false }
+            { name: "Benny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Bing", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Dan Lau", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "George", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Giles", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jack", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jay", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kenny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kok Kit Lee", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kwok", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Michael Leung", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Michael Poon", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Nelson", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Paul", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Peter", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Phil", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Steve", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Tony", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Wai Yip Lee", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "William", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "二少", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "建哥", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "梁光远", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "韓家聲", games: 0, available: false, checkedIn: false, checkInTime: null }
         ];
 
         const thursdayGlenOaks = [
-            { name: "Alex", games: 0, available: false },
-            { name: "Amenophis", games: 0, available: false },
-            { name: "Andrew", games: 0, available: false },
-            { name: "Benghor", games: 0, available: false },
-            { name: "Buddy", games: 0, available: false },
-            { name: "Danny", games: 0, available: false },
-            { name: "David", games: 0, available: false },
-            { name: "Demz", games: 0, available: false },
-            { name: "Devon", games: 0, available: false },
-            { name: "Flippa", games: 0, available: false },
-            { name: "Francis", games: 0, available: false },
-            { name: "Fred", games: 0, available: false },
-            { name: "H", games: 0, available: false },
-            { name: "Hing", games: 0, available: false },
-            { name: "Indio", games: 0, available: false },
-            { name: "James", games: 0, available: false },
-            { name: "James Lin", games: 0, available: false },
-            { name: "Jay", games: 0, available: false },
-            { name: "Jimmy", games: 0, available: false },
-            { name: "Joe", games: 0, available: false },
-            { name: "JT", games: 0, available: false },
-            { name: "Justin", games: 0, available: false },
-            { name: "Kevin", games: 0, available: false },
-            { name: "KevinBookher", games: 0, available: false },
-            { name: "Kyth", games: 0, available: false },
-            { name: "Li", games: 0, available: false },
-            { name: "Todd", games: 0, available: false },
-            { name: "Tony", games: 0, available: false }
+            { name: "Alex", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Amenophis", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Andrew", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Benghor", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Buddy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "David", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Demz", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Devon", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Flippa", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Francis", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Fred", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "H", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Hing", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Indio", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James Lin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jay", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jimmy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Joe", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "JT", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Justin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kevin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "KevinBookher", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kyth", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Li", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Todd", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Tony", games: 0, available: false, checkedIn: false, checkInTime: null }
         ];
 
         const saturday = [
-            { name: "Adrian", games: 0, available: false },
-            { name: "Alex", games: 0, available: false },
-            { name: "Amenophis", games: 0, available: false },
-            { name: "Andrew Ng", games: 0, available: false },
-            { name: "Andrew Yu", games: 0, available: false },
-            { name: "Benghor", games: 0, available: false },
-            { name: "Brian", games: 0, available: false },
-            { name: "Buddy", games: 0, available: false },
-            { name: "Corey", games: 0, available: false },
-            { name: "Danny", games: 0, available: false },
-            { name: "David", games: 0, available: false },
-            { name: "David Jang", games: 0, available: false },
-            { name: "Demz", games: 0, available: false },
-            { name: "Devon", games: 0, available: false },
-            { name: "Eddie", games: 0, available: false },
-            { name: "Eliezer", games: 0, available: false },
-            { name: "Eric", games: 0, available: false },
-            { name: "Flippa", games: 0, available: false },
-            { name: "Francis", games: 0, available: false },
-            { name: "Fred", games: 0, available: false },
-            { name: "G", games: 0, available: false },
-            { name: "Gyu", games: 0, available: false },
-            { name: "H", games: 0, available: false },
-            { name: "Hing", games: 0, available: false },
-            { name: "Indio", games: 0, available: false },
-            { name: "Jabe", games: 0, available: false },
-            { name: "James", games: 0, available: false },
-            { name: "James Lin", games: 0, available: false },
-            { name: "Jason", games: 0, available: false },
-            { name: "Jay", games: 0, available: false },
-            { name: "Jim Turvey", games: 0, available: false },
-            { name: "Jimmy", games: 0, available: false },
-            { name: "Joe", games: 0, available: false },
-            { name: "John", games: 0, available: false },
-            { name: "John Kim", games: 0, available: false },
-            { name: "Jon", games: 0, available: false },
-            { name: "Josh", games: 0, available: false },
-            { name: "JT", games: 0, available: false },
-            { name: "Justin", games: 0, available: false },
-            { name: "Kevin", games: 0, available: false },
-            { name: "KevinBookher", games: 0, available: false },
-            { name: "Kyth", games: 0, available: false },
-            { name: "Li", games: 0, available: false },
-            { name: "Otari", games: 0, available: false },
-            { name: "Paul", games: 0, available: false },
-            { name: "Rashan", games: 0, available: false },
-            { name: "Ray", games: 0, available: false },
-            { name: "Ricky", games: 0, available: false },
-            { name: "RJ", games: 0, available: false },
-            { name: "Steve", games: 0, available: false },
-            { name: "Tasso", games: 0, available: false },
-            { name: "Timothy", games: 0, available: false },
-            { name: "Todd", games: 0, available: false },
-            { name: "Tony", games: 0, available: false }
+            { name: "Adrian", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Alex", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Amenophis", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Andrew Ng", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Andrew Yu", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Benghor", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Brian", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Buddy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Corey", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "David", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "David Jang", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Demz", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Devon", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eddie", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eliezer", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eric", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Flippa", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Francis", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Fred", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "G", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Gyu", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "H", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Hing", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Indio", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jabe", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James Lin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jason", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jay", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jim Turvey", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jimmy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Joe", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "John", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "John Kim", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jon", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Josh", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "JT", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Justin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kevin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "KevinBookher", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kyth", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Li", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Otari", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Paul", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Rashan", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ray", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ricky", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "RJ", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Steve", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Tasso", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Timothy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Todd", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Tony", games: 0, available: false, checkedIn: false, checkInTime: null }
         ];
 
         const sunday = [
-            { name: "Adrian", games: 0, available: false },
-            { name: "Alex", games: 0, available: false },
-            { name: "Andy", games: 0, available: false },
-            { name: "Angel", games: 0, available: false },
-            { name: "Angel Jr", games: 0, available: false },
-            { name: "Bill", games: 0, available: false },
-            { name: "Daniel", games: 0, available: false },
-            { name: "Danny", games: 0, available: false },
-            { name: "Dofu", games: 0, available: false },
-            { name: "Don", games: 0, available: false },
-            { name: "Dong", games: 0, available: false },
-            { name: "Edwin", games: 0, available: false },
-            { name: "Eugene", games: 0, available: false },
-            { name: "Jack", games: 0, available: false },
-            { name: "James", games: 0, available: false },
-            { name: "Jay", games: 0, available: false },
-            { name: "John", games: 0, available: false },
-            { name: "Kasing", games: 0, available: false },
-            { name: "Kent", games: 0, available: false },
-            { name: "Kyo", games: 0, available: false },
-            { name: "Mark", games: 0, available: false },
-            { name: "Matthew", games: 0, available: false },
-            { name: "Mike", games: 0, available: false },
-            { name: "Ray", games: 0, available: false },
-            { name: "Randy", games: 0, available: false },
-            { name: "Sit Wong", games: 0, available: false },
-            { name: "Waiho", games: 0, available: false },
-            { name: "Wing", games: 0, available: false },
-            { name: "Yili", games: 0, available: false },
-            { name: "Zai Zai", games: 0, available: false },
-            { name: "梁光远", games: 0, available: false }
+            { name: "Adrian", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Alex", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Andy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Angel", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Angel Jr", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Bill", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Daniel", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Dofu", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Don", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Dong", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Edwin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eugene", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jack", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jay", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "John", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kasing", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kent", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kyo", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Mark", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Matthew", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Mike", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ray", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Randy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Sit Wong", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Waiho", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Wing", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Yili", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Zai Zai", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "梁光远", games: 0, available: false, checkedIn: false, checkInTime: null }
         ].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
 
         const stelton = [
-            { name: "Adi", games: 0, available: false },
-            { name: "Ben", games: 0, available: false },
-            { name: "Brent", games: 0, available: false },
-            { name: "Chad", games: 0, available: false },
-            { name: "Dan", games: 0, available: false },
-            { name: "Danny", games: 0, available: false },
-            { name: "Devin", games: 0, available: false },
-            { name: "Ed", games: 0, available: false },
-            { name: "Giles", games: 0, available: false },
-            { name: "Houdine", games: 0, available: false },
-            { name: "Joe", games: 0, available: false },
-            { name: "Joel", games: 0, available: false },
-            { name: "Joey", games: 0, available: false },
-            { name: "Jose", games: 0, available: false },
-            { name: "Keith", games: 0, available: false },
-            { name: "Malik", games: 0, available: false },
-            { name: "Marshall", games: 0, available: false },
-            { name: "Matt", games: 0, available: false },
-            { name: "Mike", games: 0, available: false },
-            { name: "Mike Jr", games: 0, available: false },
-            { name: "Pat Lawrence", games: 0, available: false },
-            { name: "Pat Liang", games: 0, available: false },
-            { name: "Phil", games: 0, available: false },
-            { name: "Rafi", games: 0, available: false },
-            { name: "Scott", games: 0, available: false },
-            { name: "Steve Braunstein", games: 0, available: false },
-            { name: "Steve Vlaun", games: 0, available: false },
-            { name: "Troy", games: 0, available: false },
-            { name: "Valeriy", games: 0, available: false }
+            { name: "Adi", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ben", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Brent", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Chad", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Dan", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Devin", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ed", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Giles", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Houdine", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Joe", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Joel", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Joey", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jose", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Keith", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Malik", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Marshall", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Matt", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Mike", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Mike Jr", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Pat Lawrence", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Pat Liang", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Phil", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Rafi", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Scott", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Steve Braunstein", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Steve Vlaun", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Troy", games: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Valeriy", games: 0, available: false, checkedIn: false, checkInTime: null }
         ];
 
         let players = empty.map(p => ({ ...p }));
@@ -580,7 +614,11 @@
             if (savedState) {
                 try {
                     const parsed = JSON.parse(savedState);
-                    players = parsed.players || [];
+                    players = (parsed.players || []).map(p => ({
+                        ...p,
+                        checkedIn: p.checkedIn || false,
+                        checkInTime: p.checkInTime || null
+                    }));
                     gamesHistory = parsed.gamesHistory || [];
                     lastGameIndices = parsed.lastGameIndices || [];
                     return true;
@@ -604,7 +642,7 @@
                 if (selectedRoster === 'sunday') sourceList = sunday;
                 if (selectedRoster === 'stelton') sourceList = stelton;
                 
-                players = sourceList.map(p => ({ ...p, available: false }));
+                players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTime: null }));
                 lastGameIndices = [];
                 gamesHistory = [];
             }
@@ -641,20 +679,6 @@
             let total = players.length;
             let availableCount = players.filter(p => p.available).length;
             document.getElementById('playerCountDisplay').innerHTML = `<b>Available:</b> ${availableCount} / ${total}`;
-            
-            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-            if (selectAllCheckbox) {
-                if (total > 0 && availableCount === total) {
-                    selectAllCheckbox.checked = true;
-                    selectAllCheckbox.indeterminate = false;
-                } else if (availableCount === 0) {
-                    selectAllCheckbox.checked = false;
-                    selectAllCheckbox.indeterminate = false;
-                } else {
-                    selectAllCheckbox.checked = false;
-                    selectAllCheckbox.indeterminate = true;
-                }
-            }
         }
 
         function renderPlayerList() {
@@ -666,29 +690,32 @@
 
             let headerLeftGroup = document.createElement('div');
             headerLeftGroup.className = 'header-left-group';
-
-            let selectAllCheckbox = document.createElement('input');
-            selectAllCheckbox.type = 'checkbox';
-            selectAllCheckbox.id = 'selectAllCheckbox';
-            selectAllCheckbox.onchange = function() { toggleSelectAll(selectAllCheckbox.checked); };
-
             let headerLabel = document.createElement('span');
             headerLabel.textContent = "Player Name";
-
-            headerLeftGroup.appendChild(selectAllCheckbox);
             headerLeftGroup.appendChild(headerLabel);
 
-            let headerRightSpan = document.createElement('span');
-            headerRightSpan.textContent = "Games Played";
+            let headerCenterGroup = document.createElement('div');
+            headerCenterGroup.className = 'header-center-group';
+            let checkedInLabel = document.createElement('span');
+            checkedInLabel.textContent = "Checked In";
+            headerCenterGroup.appendChild(checkedInLabel);
+
+            let headerRightGroup = document.createElement('div');
+            headerRightGroup.className = 'header-right-group';
+            let gamesPlayedSpan = document.createElement('span');
+            gamesPlayedSpan.textContent = "Games Played";
+            headerRightGroup.appendChild(gamesPlayedSpan);
 
             headerDiv.appendChild(headerLeftGroup);
-            headerDiv.appendChild(headerRightSpan);
+            headerDiv.appendChild(headerCenterGroup);
+            headerDiv.appendChild(headerRightGroup);
             container.appendChild(headerDiv);
 
             players.forEach((p, index) => {
                 let div = document.createElement('div');
                 div.className = 'player-item';
 
+                // Left Column: Available & Player Name
                 let leftGroup = document.createElement('div');
                 leftGroup.className = 'player-left-group';
 
@@ -712,6 +739,29 @@
                 infoDiv.appendChild(availableCheckbox);
                 infoDiv.appendChild(label);
                 leftGroup.appendChild(infoDiv);
+
+                // Center Column: Left-aligned Check-In + Timestamp
+                let centerGroup = document.createElement('div');
+                centerGroup.className = 'player-center-group';
+
+                let checkedInCheckbox = document.createElement('input');
+                checkedInCheckbox.type = 'checkbox';
+                checkedInCheckbox.checked = p.checkedIn || false;
+                checkedInCheckbox.id = 'checkedIn_' + index;
+                checkedInCheckbox.onchange = function() { toggleCheckedIn(index, checkedInCheckbox.checked); };
+
+                centerGroup.appendChild(checkedInCheckbox);
+
+                if (p.checkedIn && p.checkInTime) {
+                    let timeSpan = document.createElement('span');
+                    timeSpan.className = 'checkin-time';
+                    timeSpan.textContent = p.checkInTime;
+                    centerGroup.appendChild(timeSpan);
+                }
+
+                // Right Column: Games Played Counters
+                let rightGroup = document.createElement('div');
+                rightGroup.className = 'player-right-group';
 
                 let actionsDiv = document.createElement('div');
                 actionsDiv.style.display = 'flex';
@@ -740,9 +790,11 @@
 
                 actionsDiv.appendChild(badge);
                 actionsDiv.appendChild(counterDiv);
+                rightGroup.appendChild(actionsDiv);
 
                 div.appendChild(leftGroup);
-                div.appendChild(actionsDiv);
+                div.appendChild(centerGroup);
+                div.appendChild(rightGroup);
                 container.appendChild(div);
             });
 
@@ -753,7 +805,7 @@
             const input = document.getElementById('newPlayerName');
             const name = input.value.trim();
             if (name !== "") {
-                players.push({ name: name, games: 0, available: false });
+                players.push({ name: name, games: 0, available: false, checkedIn: false, checkInTime: null });
                 players.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
                 input.value = '';
                 hideAlert();
@@ -773,10 +825,19 @@
             saveToLocalStorage();
         }
 
-        function toggleSelectAll(isChecked) {
-            players.forEach(p => {
-                p.available = isChecked;
-            });
+        function toggleCheckedIn(index, isCheckedIn) {
+            players[index].checkedIn = isCheckedIn;
+
+            if (isCheckedIn) {
+                // Check available status & record timestamp
+                players[index].available = true;
+                players[index].checkInTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                // Uncheck available status & clear timestamp
+                players[index].available = false;
+                players[index].checkInTime = null;
+            }
+
             renderPlayerList();
             saveToLocalStorage();
         }
@@ -802,7 +863,7 @@
             if (currentRoster === 'sunday') sourceList = sunday;
             if (currentRoster === 'stelton') sourceList = stelton;
 
-            players = sourceList.map(p => ({ ...p, available: false }));
+            players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTime: null }));
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
