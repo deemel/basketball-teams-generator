@@ -1,4 +1,4 @@
-[source: 1]<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -261,21 +261,6 @@
         }
         .delete-btn:hover {
             background-color: #c82333;
-        }
-        .combo-summary {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px dashed #ccc;
-        }
-        .combo-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: #eef2f7;
-            border-radius: 4px;
-            margin-bottom: 6px;
-            font-size: 14px;
         }
     </style>
 </head>
@@ -805,9 +790,6 @@
         }
 
         function resetTracker() {
-            const currentRoster = document.getElementById('rosterSelect').value;
-            localStorage.removeItem('teams_tracker_state_' + currentRoster);
-
             players.forEach(p => {
                 p.games = 0;
                 p.available = true;
@@ -822,6 +804,7 @@
             document.getElementById('historyContainer').innerHTML = '';
             hideAlert();
             renderPlayerList();
+            saveToLocalStorage();
 
             const container = document.getElementById('playerContainer');
             if (container) {
@@ -993,17 +976,7 @@
 
             historyCard.style.display = 'block';
 
-            // Map to track team combination frequency
-            let combinationCounts = {};
-
             gamesHistory.forEach((game, index) => {
-                // Count team combinations (order of players within team is sorted alphabetically)
-                let t1Key = game.team1.slice().sort().join(', ');
-                let t2Key = game.team2.slice().sort().join(', ');
-
-                combinationCounts[t1Key] = (combinationCounts[t1Key] || 0) + 1;
-                combinationCounts[t2Key] = (combinationCounts[t2Key] || 0) + 1;
-
                 let gameDiv = document.createElement('div');
                 gameDiv.className = 'history-item';
 
@@ -1069,34 +1042,6 @@
 
                 historyContainer.appendChild(gameDiv);
             });
-
-            // Summary section for Team Combination Counts
-            let summaryContainer = document.createElement('div');
-            summaryContainer.className = 'combo-summary';
-            
-            let summaryTitle = document.createElement('h3');
-            summaryTitle.textContent = 'Team Combinations Frequency';
-            summaryTitle.style.fontSize = '1.1rem';
-            summaryTitle.style.marginBottom = '10px';
-            summaryContainer.appendChild(summaryTitle);
-
-            Object.keys(combinationCounts).forEach(teamCombo => {
-                let comboDiv = document.createElement('div');
-                comboDiv.className = 'combo-item';
-                
-                let comboLabel = document.createElement('span');
-                comboLabel.textContent = teamCombo;
-                
-                let countBadge = document.createElement('span');
-                countBadge.className = 'stats-badge';
-                countBadge.textContent = `${combinationCounts[teamCombo]} game${combinationCounts[teamCombo] > 1 ? 's' : ''}`;
-
-                comboDiv.appendChild(comboLabel);
-                comboDiv.appendChild(countBadge);
-                summaryContainer.appendChild(comboDiv);
-            });
-
-            historyContainer.appendChild(summaryContainer);
         }
 
         // Initialize state on page load
