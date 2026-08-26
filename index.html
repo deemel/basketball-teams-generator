@@ -336,7 +336,7 @@
         
         <!-- Add Player Form -->
         <div style="margin-bottom: 15px; display: flex; gap: 5px;">
-            <input type="text" id="newPlayerName" placeholder="Enter player name..." style="flex: 1; margin-right: 0;">
+            <input type="text" id="newPlayerName" placeholder="Enter player name..." maxlength="16" style="flex: 1; margin-right: 0;">
             <button onclick="addPlayer()">Add</button>
         </div>
 
@@ -815,14 +815,19 @@
         function addPlayer() {
             const input = document.getElementById('newPlayerName');
             const name = input.value.trim();
-            if (name !== "") {
-                players.push({ name: name, games: 0, available: false, checkedIn: false, checkInTime: null });
-                players.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
-                input.value = '';
-                hideAlert();
-                renderPlayerList();
-                saveToLocalStorage();
+            if (name === "") {
+                return;
             }
+            if (name.length > 16) {
+                showAlert("Player name must be 16 characters or fewer.");
+                return;
+            }
+            players.push({ name: name, games: 0, available: false, checkedIn: false, checkInTime: null });
+            players.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
+            input.value = '';
+            hideAlert();
+            renderPlayerList();
+            saveToLocalStorage();
         }
 
         function toggleAvailable(index, isAvailable) {
