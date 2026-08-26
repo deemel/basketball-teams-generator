@@ -1,12 +1,12 @@
 # Teams Generator & Games Played Tracker
 
-A simple app to help organize pickup games and make sure everyone gets a fair number of turns to play.
+An app to help organize pickup games and make sure everyone gets a fair number of turns to play.
 
 ## What it does
 
 **Pick your group**
 
-Choose from your regular groups (Monday, Thursday, Saturday, Sunday, etc.) from a dropdown, or start with a blank list and add your own players. Whatever you set up is saved automatically — close the app and come back later, and everything's just how you left it.
+Choose preloaded groups (Monday, Thursday, Saturday, Sunday, etc.) from a dropdown, or start with a blank list and add your own players. Whatever you set up is saved automatically — close the app and come back later, and everything's just how you left it.
 
 **Add players easily**
 
