@@ -873,6 +873,11 @@
                 showAlert("Player name must be 16 characters or fewer.");
                 return;
             }
+            const isDuplicate = players.some(p => p.name.localeCompare(name, 'en', { sensitivity: 'accent' }) === 0);
+            if (isDuplicate) {
+                showAlert(`"${name}" is already on this roster.`);
+                return;
+            }
             players.push({ name: name, gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null, gamesOffset: null });
             players.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
             input.value = '';
