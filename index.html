@@ -660,9 +660,9 @@
             renderHistory();
             saveToLocalStorage();
 
-            const container = document.getElementById('playerContainer');
-            if (container) {
-                container.scrollTop = 0;
+            const rowsContainer = document.querySelector('#playerContainer .player-rows');
+            if (rowsContainer) {
+                rowsContainer.scrollTop = 0;
             }
         }
 
@@ -685,6 +685,11 @@
 
         function renderPlayerList() {
             const container = document.getElementById('playerContainer');
+
+            // Preserve current scroll position before rebuilding
+            const existingRows = container.querySelector('.player-rows');
+            const previousScrollTop = existingRows ? existingRows.scrollTop : 0;
+
             container.innerHTML = '';
 
             let headerDiv = document.createElement('div');
@@ -713,7 +718,6 @@
             headerDiv.appendChild(headerRightGroup);
             container.appendChild(headerDiv);
 
-            // Scrollable wrapper for just the player rows, so the header above stays fixed
             let rowsContainer = document.createElement('div');
             rowsContainer.className = 'player-rows';
             container.appendChild(rowsContainer);
@@ -722,7 +726,6 @@
                 let div = document.createElement('div');
                 div.className = 'player-item';
 
-                // Left Column: Available & Player Name
                 let leftGroup = document.createElement('div');
                 leftGroup.className = 'player-left-group';
 
@@ -747,7 +750,6 @@
                 infoDiv.appendChild(label);
                 leftGroup.appendChild(infoDiv);
 
-                // Center Column: Left-aligned Check-In + Timestamp
                 let centerGroup = document.createElement('div');
                 centerGroup.className = 'player-center-group';
 
@@ -766,7 +768,6 @@
                     centerGroup.appendChild(timeSpan);
                 }
 
-                // Right Column: Games Played Counters
                 let rightGroup = document.createElement('div');
                 rightGroup.className = 'player-right-group';
 
@@ -804,6 +805,9 @@
                 div.appendChild(rightGroup);
                 rowsContainer.appendChild(div);
             });
+
+            // Restore scroll position after rebuilding the list
+            rowsContainer.scrollTop = previousScrollTop;
 
             updatePlayerCounts();
         }
@@ -899,9 +903,9 @@
             hideAlert();
             renderPlayerList();
 
-            const container = document.getElementById('playerContainer');
-            if (container) {
-                container.scrollTop = 0;
+            const rowsContainer = document.querySelector('#playerContainer .player-rows');
+            if (rowsContainer) {
+                rowsContainer.scrollTop = 0;
             }
         }
 
