@@ -814,10 +814,28 @@
             }
         }
 
-        function toggleAvailable(index, isAvailable) {
+        function toggleAvailable0(index, isAvailable) {
             players[index].available = isAvailable;
             updatePlayerCounts();
             
+            const label = document.querySelector(`label[for="available_${index}"]`);
+            if (label) {
+                label.style.color = isAvailable ? '#000' : '#888';
+            }
+            saveToLocalStorage();
+        }
+
+        function toggleAvailable(index, isAvailable) {
+            players[index].available = isAvailable;
+
+            // If marking available and they aren't checked in yet, auto check them in
+            if (isAvailable && !players[index].checkedIn) {
+                toggleCheckedIn(index, true);
+                return; // toggleCheckedIn() already re-renders and saves
+            }
+
+            updatePlayerCounts();
+
             const label = document.querySelector(`label[for="available_${index}"]`);
             if (label) {
                 label.style.color = isAvailable ? '#000' : '#888';
