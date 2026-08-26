@@ -817,37 +817,33 @@
                 offsetBadge.textContent = (p.gamesOffset === null || p.gamesOffset === undefined) ? '-' : p.gamesOffset;
                 offsetGroup.appendChild(offsetBadge);
 
-                // Right Column: Games Played Counters
+                // Right Column: Games Played Counter (minus, value, plus)
                 let rightGroup = document.createElement('div');
                 rightGroup.className = 'player-right-group';
 
                 let actionsDiv = document.createElement('div');
+                actionsDiv.className = 'counter-controls';
                 actionsDiv.style.display = 'flex';
                 actionsDiv.style.alignItems = 'center';
                 actionsDiv.style.gap = '8px';
-
-                let badge = document.createElement('span');
-                badge.className = 'stats-badge';
-                badge.textContent = p.gamesPlayed;
-
-                let counterDiv = document.createElement('div');
-                counterDiv.className = 'counter-controls';
 
                 let minusBtn = document.createElement('button');
                 minusBtn.textContent = '-';
                 minusBtn.className = 'counter-btn';
                 minusBtn.onclick = function() { adjustGames(index, -1); };
 
+                let badge = document.createElement('span');
+                badge.className = 'stats-badge';
+                badge.textContent = p.gamesPlayed;
+
                 let plusBtn = document.createElement('button');
                 plusBtn.textContent = '+';
                 plusBtn.className = 'counter-btn';
                 plusBtn.onclick = function() { adjustGames(index, 1); };
 
-                counterDiv.appendChild(minusBtn);
-                counterDiv.appendChild(plusBtn);
-
+                actionsDiv.appendChild(minusBtn);
                 actionsDiv.appendChild(badge);
-                actionsDiv.appendChild(counterDiv);
+                actionsDiv.appendChild(plusBtn);
                 rightGroup.appendChild(actionsDiv);
 
                 div.appendChild(leftGroup);
