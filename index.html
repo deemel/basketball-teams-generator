@@ -651,6 +651,16 @@
             return false;
         }
 
+        /**
+         * Effective Games Played: a player's raw gamesPlayed plus their gamesOffset
+         * (the average effective games they were credited with at check-in). Used as
+         * the fairness basis for both the check-in average calculation and team generation.
+         */
+        function getEffectiveGamesPlayed(player) {
+            let offset = (player.gamesOffset === null || player.gamesOffset === undefined) ? 0 : player.gamesOffset;
+            return player.gamesPlayed + offset;
+        }
+
         function switchRoster() {
             const selectedRoster = document.getElementById('rosterSelect').value;
             let loaded = loadFromLocalStorage(selectedRoster);
@@ -797,7 +807,7 @@
                     centerGroup.appendChild(timeSpan);
                 }
 
-                // Offset Column: Games Offset (average of already checked-in players at check-in time)
+                // Offset Column: Games Offset (average effective games played of already checked-in players at check-in time)
                 let offsetGroup = document.createElement('div');
                 offsetGroup.className = 'player-offset-group';
 
@@ -890,19 +900,15 @@
 
         function toggleCheckedIn(index, isCheckedIn) {
             if (isCheckedIn) {
-                // Calculate current average games played across all already checked-in players
+                // Calculate current average EFFECTIVE games played (gamesPlayed + gamesOffset)
+                // across all already checked-in players
                 const checkedInPlayers = players.filter(p => p.checkedIn);
                 const avgGames = checkedInPlayers.length > 0
-                    ? Math.floor(checkedInPlayers.reduce((sum, p) => sum + p.gamesPlayed, 0) / checkedInPlayers.length)
+                    ? Math.floor(checkedInPlayers.reduce((sum, p) => sum + getEffectiveGamesPlayed(p), 0) / checkedInPlayers.length)
                     : 0;
 
-                // Record this check-in's games offset snapshot
+                // Record this check-in's games offset snapshot (used as a fairness input during team generation)
                 players[index].gamesOffset = avgGames;
-
-                // Set player's games played to floor average if checking in for the first time (gamesPlayed == 0)
-                if (players[index].gamesPlayed === 0) {
-                    players[index].gamesPlayed = avgGames;
-                }
 
                 players[index].checkedIn = true;
                 players[index].available = true;
@@ -1025,8 +1031,15 @@
                 .sort((a, b) => a - b)
                 .forEach(score => {
                     let group = groupedMap[score];
-                    // Randomize ties within the same streak tier
+
+                    // Pre-shuffle so any exact ties in effective games played land in random order
                     group.sort(() => Math.random() - 0.5);
+
+                    // Within each streak tier, prioritize players with fewer effective games played
+                    // (gamesPlayed + gamesOffset) — sort() is stable, so the random pre-shuffle
+                    // above still governs exact ties
+                    group.sort((a, b) => getEffectiveGamesPlayed(players[a]) - getEffectiveGamesPlayed(players[b]));
+
                     prioritizedIndices.push(...group);
                 });
 
