@@ -110,6 +110,8 @@
             padding: 8px;
             margin: 5px 0 10px 0;
             border-radius: 4px;
+        }
+        .player-rows {
             max-height: 400px;
             overflow-y: auto;
         }
@@ -711,6 +713,11 @@
             headerDiv.appendChild(headerRightGroup);
             container.appendChild(headerDiv);
 
+            // Scrollable wrapper for just the player rows, so the header above stays fixed
+            let rowsContainer = document.createElement('div');
+            rowsContainer.className = 'player-rows';
+            container.appendChild(rowsContainer);
+
             players.forEach((p, index) => {
                 let div = document.createElement('div');
                 div.className = 'player-item';
@@ -795,7 +802,7 @@
                 div.appendChild(leftGroup);
                 div.appendChild(centerGroup);
                 div.appendChild(rightGroup);
-                container.appendChild(div);
+                rowsContainer.appendChild(div);
             });
 
             updatePlayerCounts();
@@ -812,17 +819,6 @@
                 renderPlayerList();
                 saveToLocalStorage();
             }
-        }
-
-        function toggleAvailable0(index, isAvailable) {
-            players[index].available = isAvailable;
-            updatePlayerCounts();
-            
-            const label = document.querySelector(`label[for="available_${index}"]`);
-            if (label) {
-                label.style.color = isAvailable ? '#000' : '#888';
-            }
-            saveToLocalStorage();
         }
 
         function toggleAvailable(index, isAvailable) {
@@ -907,100 +903,6 @@
             if (container) {
                 container.scrollTop = 0;
             }
-        }
-
-        function generateTeams0() {
-            hideAlert();
-            let perTeamInput = parseInt(document.getElementById('playersPerTeamInput').value);
-            if (isNaN(perTeamInput) || perTeamInput < 1) {
-                showAlert("Please enter a valid number of players per team!");
-                return;
-            }
-
-            let selectedIndices = [];
-            players.forEach((p, index) => {
-                if (p.available) {
-                    selectedIndices.push(index);
-                }
-            });
-
-            let requiredTotal = perTeamInput * 2;
-            if (selectedIndices.length < requiredTotal) {
-                showAlert(`Please select at least ${requiredTotal} available players to form two ${perTeamInput}-player teams!`);
-                return;
-            }
-
-            // Helper to calculate consecutive games played up to the current state
-            function getConsecutiveGamesPlayed(playerIndex) {
-                let count = 0;
-                let playerName = players[playerIndex].name;
-                
-                for (let i = gamesHistory.length - 1; i >= 0; i--) {
-                    let game = gamesHistory[i];
-                    let playedInGame = game.team1.includes(playerName) || game.team2.includes(playerName);
-                    
-                    if (playedInGame) {
-                        count++;
-                    } else {
-                        break;
-                    }
-                }
-                return count;
-            }
-
-            // Group players by consecutive_games_played + total_games_played
-            let groupedMap = {};
-            selectedIndices.forEach(i => {
-                let consecutiveCount = getConsecutiveGamesPlayed(i);
-                let totalGames = players[i].games;
-                let key = `${String(consecutiveCount).padStart(4, '0')}_${String(totalGames).padStart(4, '0')}`;
-
-                if (!groupedMap[key]) groupedMap[key] = [];
-                groupedMap[key].push(i);
-            });
-
-            // Shuffle within identical priority tiers
-            let prioritizedIndices = [];
-            Object.keys(groupedMap).sort().forEach(key => {
-                let group = groupedMap[key];
-                group.sort(() => Math.random() - 0.5);
-                prioritizedIndices.push(...group);
-            });
-
-            let totalNeeded = perTeamInput * 2;
-            let chosenPlayers = prioritizedIndices.slice(0, totalNeeded);
-            chosenPlayers.sort(() => Math.random() - 0.5);
-
-            pendingTeam1Indices = chosenPlayers.slice(0, perTeamInput);
-            pendingTeam2Indices = chosenPlayers.slice(perTeamInput, totalNeeded);
-
-            // Sort team arrays alphabetically by player name
-            pendingTeam1Indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
-            pendingTeam2Indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
-
-            const team1List = document.getElementById('team1List');
-            const team2List = document.getElementById('team2List');
-            
-            team1List.innerHTML = '';
-            team2List.innerHTML = '';
-
-            pendingTeam1Indices.forEach(i => {
-                let li = document.createElement('li');
-                li.textContent = players[i].name;
-                team1List.appendChild(li);
-            });
-
-            pendingTeam2Indices.forEach(i => {
-                let li = document.createElement('li');
-                li.textContent = players[i].name;
-                team2List.appendChild(li);
-            });
-
-            const acceptBtn = document.getElementById('acceptBtn');
-            acceptBtn.disabled = false;
-            acceptBtn.textContent = "Accept Teams & Update Games Played";
-
-            document.getElementById('outputCard').style.display = 'block';
         }
 
         function generateTeams() {
