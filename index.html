@@ -898,10 +898,10 @@
             gamesHistory = [];
             document.getElementById('playersPerTeamInput').value = 5;
             document.getElementById('outputCard').style.display = 'none';
-            document.getElementById('historyCard').style.display = 'none';
-            document.getElementById('historyContainer').innerHTML = '';
             hideAlert();
             renderPlayerList();
+            renderHistory();
+            saveToLocalStorage();
 
             const rowsContainer = document.querySelector('#playerContainer .player-rows');
             if (rowsContainer) {
