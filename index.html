@@ -71,6 +71,16 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+        .copy-btn {
+            background-color: #17a2b8;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+            padding: 12px;
+        }
+        .copy-btn:hover {
+            background-color: #138496;
+        }
         .reset-btn {
             background-color: #dc3545;
             padding: 8px 12px;
@@ -380,6 +390,9 @@
         </div>
         <!-- Accept Teams Button -->
         <button id="acceptBtn" class="accept-btn" onclick="acceptLineup()">Accept Teams & Update Games Played</button>
+
+        <!-- Copy Teams Button -->
+        <button id="copyTeamsBtn" class="copy-btn" onclick="copyTeamsToClipboard()">Copy Teams as Text</button>
     </div>
 
     <!-- Games Played History -->
@@ -1123,6 +1136,63 @@
             acceptBtn.textContent = "Accept Teams & Update Games Played";
 
             document.getElementById('outputCard').style.display = 'block';
+        }
+
+        function copyTeamsToClipboard() {
+            if (pendingTeam1Indices.length === 0 && pendingTeam2Indices.length === 0) {
+                showAlert("Generate teams first before copying.");
+                return;
+            }
+
+            let lines = [];
+            lines.push("Team 1:");
+            pendingTeam1Indices.forEach((i, idx) => {
+                lines.push(`${idx + 1}. ${players[i].name}`);
+            });
+            lines.push("");
+            lines.push("Team 2:");
+            pendingTeam2Indices.forEach((i, idx) => {
+                lines.push(`${idx + 1}. ${players[i].name}`);
+            });
+
+            let teamsText = lines.join("\n");
+
+            const copyBtn = document.getElementById('copyTeamsBtn');
+            const originalText = copyBtn ? copyBtn.textContent : null;
+
+            function showCopiedFeedback() {
+                if (copyBtn) {
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 1500);
+                }
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(teamsText).then(showCopiedFeedback).catch(() => {
+                    fallbackCopyText(teamsText, showCopiedFeedback);
+                });
+            } else {
+                fallbackCopyText(teamsText, showCopiedFeedback);
+            }
+        }
+
+        function fallbackCopyText(text, onSuccess) {
+            let textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                if (onSuccess) onSuccess();
+            } catch (e) {
+                showAlert("Unable to copy teams. Please copy manually.");
+            }
+            document.body.removeChild(textarea);
         }
 
         function acceptLineup() {
