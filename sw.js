@@ -4,8 +4,8 @@ const FILES_TO_CACHE = [
   './index.html',
   './manifest.json',
   './favicon.png',
-  './icon-192.png',
-  './icon-512.png'
+  './favicon-192.png',
+  './favicon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
