@@ -192,7 +192,8 @@
             align-items: center;
             gap: 8px;
         }
-        .player-item input[type="checkbox"] {
+        .player-item input[type="checkbox"],
+        .list-header input[type="checkbox"] {
             transform: scale(1.2);
         }
         .checkin-time {
@@ -714,6 +715,33 @@
             document.getElementById('playerCountDisplay').innerHTML = `<b>Available:</b> ${availableCount} / ${total}`;
         }
 
+        function toggleSelectAllAvailable(isChecked) {
+            if (isChecked) {
+                players.forEach((p) => {
+                    if (!p.checkedIn) {
+                        // Same logic as toggleCheckedIn(): base the offset on the average
+                        // effective games played of everyone already checked in so far.
+                        const checkedInPlayers = players.filter(pl => pl.checkedIn);
+                        const avgGames = checkedInPlayers.length > 0
+                            ? Math.floor(checkedInPlayers.reduce((sum, pl) => sum + getEffectiveGamesPlayed(pl), 0) / checkedInPlayers.length)
+                            : 0;
+
+                        p.gamesOffset = avgGames;
+                        p.checkedIn = true;
+                        p.checkInTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+                    p.available = true;
+                });
+            } else {
+                players.forEach((p) => {
+                    p.available = false;
+                });
+            }
+
+            renderPlayerList();
+            saveToLocalStorage();
+        }
+
         function renderPlayerList() {
             const container = document.getElementById('playerContainer');
 
@@ -728,6 +756,18 @@
 
             let headerLeftGroup = document.createElement('div');
             headerLeftGroup.className = 'header-left-group';
+
+            let totalCount = players.length;
+            let availableCount = players.filter(p => p.available).length;
+
+            let selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'selectAllCheckbox';
+            selectAllCheckbox.checked = totalCount > 0 && availableCount === totalCount;
+            selectAllCheckbox.indeterminate = availableCount > 0 && availableCount < totalCount;
+            selectAllCheckbox.onchange = function() { toggleSelectAllAvailable(selectAllCheckbox.checked); };
+            headerLeftGroup.appendChild(selectAllCheckbox);
+
             let headerLabel = document.createElement('span');
             headerLabel.textContent = "Player Name";
             headerLeftGroup.appendChild(headerLabel);
