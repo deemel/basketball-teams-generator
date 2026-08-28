@@ -184,6 +184,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
+            gap: 10px;
             flex: 1;
         }
         .header-offset-group {
@@ -987,6 +988,36 @@
             saveToLocalStorage();
         }
 
+        function toggleAllCheckedIn(isChecked) {
+            if (isChecked) {
+                players.forEach((p) => {
+                    if (!p.checkedIn) {
+                        // Same offset logic as toggleCheckedIn()/toggleSelectAllAvailable():
+                        // base it on the average effective games played of everyone
+                        // already checked in so far in this loop.
+                        const checkedInPlayers = players.filter(pl => pl.checkedIn);
+                        const avgGames = checkedInPlayers.length > 0
+                            ? Math.floor(checkedInPlayers.reduce((sum, pl) => sum + getEffectiveGamesPlayed(pl), 0) / checkedInPlayers.length)
+                            : 0;
+
+                        p.gamesOffset = avgGames;
+                        p.checkedIn = true;
+                        p.checkInTimestamp = Date.now();
+                    }
+                    p.available = true;
+                });
+            } else {
+                players.forEach((p) => {
+                    p.checkedIn = false;
+                    p.available = false;
+                    p.checkInTimestamp = null;
+                });
+            }
+
+            renderPlayerList();
+            saveToLocalStorage();
+        }
+
         function renderPlayerList() {
             const container = document.getElementById('playerContainer');
 
@@ -1018,6 +1049,17 @@
 
             let headerCenterGroup = document.createElement('div');
             headerCenterGroup.className = 'header-center-group';
+
+            let checkedInCount = players.filter(p => p.checkedIn).length;
+
+            let selectAllCheckedInCheckbox = document.createElement('input');
+            selectAllCheckedInCheckbox.type = 'checkbox';
+            selectAllCheckedInCheckbox.id = 'selectAllCheckedInCheckbox';
+            selectAllCheckedInCheckbox.checked = totalCount > 0 && checkedInCount === totalCount;
+            selectAllCheckedInCheckbox.indeterminate = checkedInCount > 0 && checkedInCount < totalCount;
+            selectAllCheckedInCheckbox.onchange = function() { toggleAllCheckedIn(selectAllCheckedInCheckbox.checked); };
+            headerCenterGroup.appendChild(selectAllCheckedInCheckbox);
+
             let checkedInLabel = createSortableHeaderLabel("Checked In", 'checkedIn');
             headerCenterGroup.appendChild(checkedInLabel);
 
