@@ -127,6 +127,28 @@
             padding: 8px;
             margin: 5px 0 10px 0;
             border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .player-list::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('favicon-512.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 150px 150px;
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .list-header,
+        .player-rows {
+            position: relative;
+            z-index: 1;
         }
         .player-rows {
             max-height: 400px;
@@ -263,6 +285,28 @@
             background: #eef2f7;
             padding: 15px;
             border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .team::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('favicon-512.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 90px 90px;
+            opacity: 0.08;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .team h3,
+        .team ol {
+            position: relative;
+            z-index: 1;
         }
         .team h3 {
             margin-top: 0;
