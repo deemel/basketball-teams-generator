@@ -243,6 +243,14 @@
         .list-header input[type="checkbox"] {
             transform: scale(1.2);
         }
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .sortable-header:hover {
+            text-decoration: underline;
+        }
         .checkin-time {
             font-size: 0.75rem;
             color: #28a745;
@@ -711,6 +719,8 @@
         let pendingTeam2Indices = [];
         let lastGameIndices = [];
         let gamesHistory = [];
+        let sortColumn = 'name';
+        let sortDirection = 'asc';
 
         function saveToLocalStorage() {
             const currentRoster = document.getElementById('rosterSelect').value;
@@ -759,6 +769,108 @@
         function getEffectiveGamesPlayed(player) {
             let offset = (player.gamesOffset === null || player.gamesOffset === undefined) ? 0 : player.gamesOffset;
             return player.gamesPlayed + offset;
+        }
+
+        /**
+         * Parses a 12-hour time string like "03:45 PM" (as produced by
+         * toLocaleTimeString with hour/minute '2-digit') into minutes since
+         * midnight, for correct numeric time-of-day comparisons. Returns null
+         * if the string is missing or doesn't match the expected format.
+         */
+        function parseCheckInTimeToMinutes(timeStr) {
+            if (!timeStr) return null;
+            let match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (!match) return null;
+
+            let hour = parseInt(match[1], 10);
+            let minute = parseInt(match[2], 10);
+            let period = match[3].toUpperCase();
+
+            if (period === 'AM') {
+                if (hour === 12) hour = 0;
+            } else {
+                if (hour !== 12) hour += 12;
+            }
+
+            return hour * 60 + minute;
+        }
+
+        function setSortColumn(column) {
+            if (sortColumn === column) {
+                sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                // Sensible default per column: names read naturally A-Z,
+                // everything else (checkboxes/numbers) reads naturally highest/most-recent-first
+                sortDirection = (column === 'name') ? 'asc' : 'desc';
+            }
+            renderPlayerList();
+        }
+
+        function getSortedPlayerIndices() {
+            let indices = players.map((_, idx) => idx);
+
+            if (sortColumn === 'name') {
+                indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
+            } else if (sortColumn === 'checkedIn') {
+                indices.sort((a, b) => {
+                    let minutesA = parseCheckInTimeToMinutes(players[a].checkInTime);
+                    let minutesB = parseCheckInTimeToMinutes(players[b].checkInTime);
+                    if (minutesA === null) minutesA = -1;
+                    if (minutesB === null) minutesB = -1;
+                    if (minutesA !== minutesB) {
+                        return minutesA - minutesB;
+                    }
+                    // Name tiebreaker always reads A→Z regardless of column
+                    // sort direction. Since the whole array gets reversed below when
+                    // sortDirection is 'desc', negate the comparison here so it
+                    // lands back in A→Z order after that reversal.
+                    let nameCompare = players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' });
+                    return sortDirection === 'desc' ? -nameCompare : nameCompare;
+                });
+            } else if (sortColumn === 'gamesOffset') {
+                indices.sort((a, b) => {
+                    let offsetA = (players[a].gamesOffset === null || players[a].gamesOffset === undefined) ? -1 : players[a].gamesOffset;
+                    let offsetB = (players[b].gamesOffset === null || players[b].gamesOffset === undefined) ? -1 : players[b].gamesOffset;
+                    if (offsetA !== offsetB) {
+                        return offsetA - offsetB;
+                    }
+                    // Name tiebreaker always reads A→Z regardless of column
+                    // sort direction — see the same pattern in the checkedIn branch above.
+                    let nameCompare = players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' });
+                    return sortDirection === 'desc' ? -nameCompare : nameCompare;
+                });
+            } else if (sortColumn === 'gamesPlayed') {
+                indices.sort((a, b) => {
+                    if (players[a].gamesPlayed !== players[b].gamesPlayed) {
+                        return players[a].gamesPlayed - players[b].gamesPlayed;
+                    }
+                    // Name tiebreaker always reads A→Z regardless of column
+                    // sort direction — see the same pattern in the checkedIn and
+                    // gamesOffset branches above.
+                    let nameCompare = players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' });
+                    return sortDirection === 'desc' ? -nameCompare : nameCompare;
+                });
+            }
+
+            if (sortDirection === 'desc') {
+                indices.reverse();
+            }
+
+            return indices;
+        }
+
+        function createSortableHeaderLabel(text, columnKey) {
+            let span = document.createElement('span');
+            span.className = 'sortable-header';
+            span.onclick = function() { setSortColumn(columnKey); };
+
+            let arrow = '';
+            if (sortColumn === columnKey) {
+                arrow = sortDirection === 'asc' ? ' \u25B2' : ' \u25BC';
+            }
+            span.textContent = text + arrow;
+            return span;
         }
 
         function switchRoster() {
@@ -867,26 +979,22 @@
             selectAllCheckbox.onchange = function() { toggleSelectAllAvailable(selectAllCheckbox.checked); };
             headerLeftGroup.appendChild(selectAllCheckbox);
 
-            let headerLabel = document.createElement('span');
-            headerLabel.textContent = "Player Name";
+            let headerLabel = createSortableHeaderLabel("Player Name", 'name');
             headerLeftGroup.appendChild(headerLabel);
 
             let headerCenterGroup = document.createElement('div');
             headerCenterGroup.className = 'header-center-group';
-            let checkedInLabel = document.createElement('span');
-            checkedInLabel.textContent = "Checked In";
+            let checkedInLabel = createSortableHeaderLabel("Checked In", 'checkedIn');
             headerCenterGroup.appendChild(checkedInLabel);
 
             let headerOffsetGroup = document.createElement('div');
             headerOffsetGroup.className = 'header-offset-group';
-            let offsetLabel = document.createElement('span');
-            offsetLabel.textContent = "Games Offset";
+            let offsetLabel = createSortableHeaderLabel("Games Offset", 'gamesOffset');
             headerOffsetGroup.appendChild(offsetLabel);
 
             let headerRightGroup = document.createElement('div');
             headerRightGroup.className = 'header-right-group';
-            let gamesPlayedSpan = document.createElement('span');
-            gamesPlayedSpan.textContent = "Games Played";
+            let gamesPlayedSpan = createSortableHeaderLabel("Games Played", 'gamesPlayed');
             headerRightGroup.appendChild(gamesPlayedSpan);
 
             headerDiv.appendChild(headerLeftGroup);
@@ -899,7 +1007,9 @@
             rowsContainer.className = 'player-rows';
             container.appendChild(rowsContainer);
 
-            players.forEach((p, index) => {
+            let sortedIndices = getSortedPlayerIndices();
+            sortedIndices.forEach((index) => {
+                let p = players[index];
                 let div = document.createElement('div');
                 div.className = 'player-item';
 
