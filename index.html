@@ -749,6 +749,7 @@
                             available: p.available || false,
                             checkedIn: p.checkedIn || false,
                             checkInTime: p.checkInTime || null,
+                            checkInTimestamp: (p.checkInTimestamp === undefined) ? null : p.checkInTimestamp,
                             gamesOffset: (p.gamesOffset === undefined) ? null : p.gamesOffset
                         };
                     });
@@ -770,6 +771,39 @@
         function getEffectiveGamesPlayed(player) {
             let offset = (player.gamesOffset === null || player.gamesOffset === undefined) ? 0 : player.gamesOffset;
             return player.gamesPlayed + offset;
+        }
+
+        /**
+         * Recalculates gamesOffset for every currently checked-in player, replaying
+         * check-ins in their original chronological order. Each player's offset is
+         * recomputed as the average effective games played of everyone who checked
+         * in before them — using the freshly corrected gamesPlayed data. This keeps
+         * offsets accurate after a game is deleted from history and gamesPlayed
+         * counts are decremented.
+         *
+         * Players whose gamesOffset is currently exactly 0 are pinned there and
+         * skipped for reassignment — they stay at 0 regardless of what the
+         * recalculated average would otherwise be. They still contribute their own
+         * (corrected) effective games played to the running average used for
+         * players who checked in after them.
+         */
+        function recalculateGamesOffsets() {
+            let checkedInIndices = players
+                .map((p, idx) => idx)
+                .filter(idx => players[idx].checkedIn)
+                .sort((a, b) => (players[a].checkInTimestamp || 0) - (players[b].checkInTimestamp || 0));
+
+            let processed = [];
+            checkedInIndices.forEach(idx => {
+                let player = players[idx];
+                if (player.gamesOffset !== 0) {
+                    let avgGames = processed.length > 0
+                        ? Math.floor(processed.reduce((sum, pl) => sum + getEffectiveGamesPlayed(pl), 0) / processed.length)
+                        : 0;
+                    player.gamesOffset = avgGames;
+                }
+                processed.push(player);
+            });
         }
 
         /**
@@ -888,7 +922,7 @@
                 if (selectedRoster === 'sunday') sourceList = sunday;
                 if (selectedRoster === 'stelton') sourceList = stelton;
                 
-                players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTime: null, gamesOffset: null }));
+                players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTime: null, checkInTimestamp: null, gamesOffset: null }));
                 lastGameIndices = [];
                 gamesHistory = [];
             }
@@ -941,6 +975,7 @@
                         p.gamesOffset = avgGames;
                         p.checkedIn = true;
                         p.checkInTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        p.checkInTimestamp = Date.now();
                     }
                     p.available = true;
                 });
@@ -1124,7 +1159,7 @@
                 showAlert(`"${name}" is already on this roster.`);
                 return;
             }
-            players.push({ name: name, gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null, gamesOffset: null });
+            players.push({ name: name, gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null, checkInTimestamp: null, gamesOffset: null });
             players.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
             input.value = '';
             hideAlert();
@@ -1165,10 +1200,12 @@
                 players[index].checkedIn = true;
                 players[index].available = true;
                 players[index].checkInTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                players[index].checkInTimestamp = Date.now();
             } else {
                 players[index].checkedIn = false;
                 players[index].available = false;
                 players[index].checkInTime = null;
+                players[index].checkInTimestamp = null;
             }
 
             renderPlayerList();
@@ -1197,7 +1234,7 @@
             if (currentRoster === 'sunday') sourceList = sunday;
             if (currentRoster === 'stelton') sourceList = stelton;
 
-            players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTime: null, gamesOffset: null }));
+            players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTime: null, checkInTimestamp: null, gamesOffset: null }));
             lastGameIndices = [];
             pendingTeam1Indices = [];
             pendingTeam2Indices = [];
@@ -1446,6 +1483,7 @@
                 lastGameIndices = [];
             }
 
+            recalculateGamesOffsets();
             renderPlayerList();
             renderHistory();
             saveToLocalStorage();
