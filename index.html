@@ -30,6 +30,15 @@
         h2 {
             font-size: 1.3rem;
             margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            flex-shrink: 0;
         }
         input[type="text"] {
             padding: 10px;
@@ -378,7 +387,7 @@
 <body>
 
     <div class="card">
-        <h2>Teams Generator & Games Played Tracker</h2>
+        <h2><img src="favicon-192.png" alt="" class="header-icon">Teams Generator & Games Played Tracker</h2>
 
         <!-- Custom Inline Message Banner -->
         <div id="customAlert" class="custom-alert">
