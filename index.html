@@ -349,6 +349,7 @@
                 <select id="rosterSelect" onchange="switchRoster()">
                     <option value="empty" selected>Custom (Empty)</option>
                     <option value="monday">Monday</option>
+                    <option value="tuesday">Tuesday</option>
                     <option value="thursday">Thursday</option>
                     <option value="thursdayGlenOaks">Thursday Glen Oaks</option>
                     <option value="saturday">Saturday</option>
@@ -442,6 +443,31 @@
             { name: "Wayne", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
             { name: "奶仔", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
             { name: "蔡哥", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
+        ];
+
+        const tuesday = [
+            { name: "Adrian", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Alex", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Andy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Angel", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Angel Jr", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Derek", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eric", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Eric Jr", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Francis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jack", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "James", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Jason", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "JD", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "JD friend 1", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "JD friend 2", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "JD friend 3", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Kevin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Lam", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Mailman", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Randy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
+            { name: "Ray T", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
         ];
 
         const thursday = [
@@ -689,6 +715,7 @@
             if (!loaded) {
                 let sourceList = empty;
                 if (selectedRoster === 'monday') sourceList = monday;
+                if (selectedRoster === 'tuesday') sourceList = tuesday;
                 if (selectedRoster === 'thursday') sourceList = thursday;
                 if (selectedRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
                 if (selectedRoster === 'saturday') sourceList = saturday;
@@ -999,6 +1026,7 @@
 
             let sourceList = empty;
             if (currentRoster === 'monday') sourceList = monday;
+            if (currentRoster === 'tuesday') sourceList = tuesday;
             if (currentRoster === 'thursday') sourceList = thursday;
             if (currentRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
             if (currentRoster === 'saturday') sourceList = saturday;
