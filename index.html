@@ -1539,11 +1539,7 @@
 
             historyCard.style.display = 'block';
 
-            // Render most-recent-first. "index" still refers to each game's
-            // actual position in gamesHistory, so numbering and deleteGame()
-            // stay correct — only the display order is reversed.
-            for (let index = gamesHistory.length - 1; index >= 0; index--) {
-                let game = gamesHistory[index];
+            gamesHistory.forEach((game, index) => {
                 let gameDiv = document.createElement('div');
                 gameDiv.className = 'history-item';
 
@@ -1608,7 +1604,7 @@
                 gameDiv.appendChild(teamsContainer);
 
                 historyContainer.appendChild(gameDiv);
-            }
+            });
         }
 
         // Initialize state on page load
