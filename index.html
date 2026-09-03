@@ -774,6 +774,20 @@
         }
 
         /**
+         * Returns the average effective games played (gamesPlayed + gamesOffset)
+         * among all currently checked-in players, floored to an integer. Used as
+         * the games-offset value assigned to a player at the moment they check in,
+         * so a newcomer is credited with roughly what everyone else has played.
+         * Returns 0 if no one is checked in yet.
+         */
+        function computeCurrentAvgOffset() {
+            const checkedInPlayers = players.filter(p => p.checkedIn);
+            return checkedInPlayers.length > 0
+                ? Math.floor(checkedInPlayers.reduce((sum, p) => sum + getEffectiveGamesPlayed(p), 0) / checkedInPlayers.length)
+                : 0;
+        }
+
+        /**
          * Recalculates gamesOffset for every currently checked-in player, replaying
          * check-ins in their original chronological order. Each player's offset is
          * recomputed as the average effective games played of everyone who checked
@@ -967,12 +981,7 @@
                     if (!p.checkedIn) {
                         // Same logic as toggleCheckedIn(): base the offset on the average
                         // effective games played of everyone already checked in so far.
-                        const checkedInPlayers = players.filter(pl => pl.checkedIn);
-                        const avgGames = checkedInPlayers.length > 0
-                            ? Math.floor(checkedInPlayers.reduce((sum, pl) => sum + getEffectiveGamesPlayed(pl), 0) / checkedInPlayers.length)
-                            : 0;
-
-                        p.gamesOffset = avgGames;
+                        p.gamesOffset = computeCurrentAvgOffset();
                         p.checkedIn = true;
                         p.checkInTimestamp = Date.now();
                     }
@@ -995,12 +1004,7 @@
                         // Same offset logic as toggleCheckedIn()/toggleSelectAllAvailable():
                         // base it on the average effective games played of everyone
                         // already checked in so far in this loop.
-                        const checkedInPlayers = players.filter(pl => pl.checkedIn);
-                        const avgGames = checkedInPlayers.length > 0
-                            ? Math.floor(checkedInPlayers.reduce((sum, pl) => sum + getEffectiveGamesPlayed(pl), 0) / checkedInPlayers.length)
-                            : 0;
-
-                        p.gamesOffset = avgGames;
+                        p.gamesOffset = computeCurrentAvgOffset();
                         p.checkedIn = true;
                         p.checkInTimestamp = Date.now();
                     }
@@ -1227,15 +1231,8 @@
 
         function toggleCheckedIn(index, isCheckedIn) {
             if (isCheckedIn) {
-                // Calculate current average EFFECTIVE games played (gamesPlayed + gamesOffset)
-                // across all already checked-in players
-                const checkedInPlayers = players.filter(p => p.checkedIn);
-                const avgGames = checkedInPlayers.length > 0
-                    ? Math.floor(checkedInPlayers.reduce((sum, p) => sum + getEffectiveGamesPlayed(p), 0) / checkedInPlayers.length)
-                    : 0;
-
                 // Record this check-in's games offset snapshot (used as a fairness input during team generation)
-                players[index].gamesOffset = avgGames;
+                players[index].gamesOffset = computeCurrentAvgOffset();
 
                 players[index].checkedIn = true;
                 players[index].available = true;
