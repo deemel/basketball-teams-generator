@@ -1250,17 +1250,15 @@
             lastGameIndices = currentSelectedTeam;
             renderPlayerList();
 
-            // Add to games history with current date/time. timestampMs is the
-            // authoritative sortable value (used by getSortedHistoryIndices());
-            // "timestamp" remains the human-readable display string.
+            // Add to games history with the current date/time as a display
+            // string only. We do NOT store or sort by a numeric timestamp
+            // (e.g. Date.now()) — see getSortedHistoryIndices() for why.
             let team1Names = pendingTeam1Indices.map(i => players[i].name);
             let team2Names = pendingTeam2Indices.map(i => players[i].name);
-            let nowMs = Date.now();
             gamesHistory.push({
                 team1: team1Names,
                 team2: team2Names,
-                timestamp: new Date(nowMs).toLocaleString(),
-                timestampMs: nowMs
+                timestamp: new Date().toLocaleString()
             });
             renderHistory();
             saveToLocalStorage();
@@ -1286,7 +1284,8 @@
             gamesHistory.splice(historyIndex, 1);
 
             // Update lastGameIndices to reflect the most recent remaining game
-            // (by timestampMs, matching the display order), or clear if empty
+            // (array position is the authoritative order — see
+            // getSortedHistoryIndices()), or clear if empty
             if (gamesHistory.length > 0) {
                 let mostRecentIdx = getSortedHistoryIndices()[0];
                 let lastGame = gamesHistory[mostRecentIdx];
@@ -1305,24 +1304,20 @@
         }
 
         /**
-         * Returns gamesHistory indices ordered newest-first by timestampMs.
-         * Falls back to array position (descending) for legacy entries saved
-         * before timestampMs existed, so display order stays sensible even
-         * for old saved data. Ties (identical or missing timestamps) fall
-         * back to array position, later position first.
+         * Returns gamesHistory indices in newest-first order. Games are always
+         * appended via push() in acceptLineup(), so array position already IS
+         * the true chronological order — reversing it is sufficient.
+         *
+         * This intentionally does NOT sort by any wall-clock timestamp
+         * (e.g. Date.now()). System clocks are not guaranteed to move only
+         * forward — NTP sync, DST transitions, or a manual/automatic clock
+         * adjustment can make it jump backward — which would give a later
+         * game a smaller timestamp than an earlier one and put them in the
+         * wrong order, persistently, once saved. Array position has no such
+         * failure mode.
          */
         function getSortedHistoryIndices() {
-            let indices = gamesHistory.map((_, idx) => idx);
-            indices.sort((a, b) => {
-                let tsA = gamesHistory[a].timestampMs;
-                let tsB = gamesHistory[b].timestampMs;
-                if (tsA === undefined && tsB === undefined) return b - a;
-                if (tsA === undefined) return 1;
-                if (tsB === undefined) return -1;
-                if (tsA !== tsB) return tsB - tsA;
-                return b - a;
-            });
-            return indices;
+            return gamesHistory.map((_, idx) => idx).reverse();
         }
 
         /**
