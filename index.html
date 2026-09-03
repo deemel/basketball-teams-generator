@@ -564,8 +564,10 @@
         let pendingTeam2Indices = [];
         let lastGameIndices = [];
         let gamesHistory = [];
-        let sortColumn = 'name';
-        let sortDirection = 'asc';
+
+        // Bundled together since they're one piece of state ("how the player
+        // list is currently sorted") rather than two independent values.
+        let playerSort = { column: 'name', direction: 'asc' };
 
         function saveToLocalStorage() {
             const currentRoster = document.getElementById('rosterSelect').value;
@@ -704,13 +706,13 @@
         }
 
         function setSortColumn(column) {
-            if (sortColumn === column) {
-                sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+            if (playerSort.column === column) {
+                playerSort.direction = (playerSort.direction === 'asc') ? 'desc' : 'asc';
             } else {
-                sortColumn = column;
+                playerSort.column = column;
                 // Sensible default per column: names read naturally A-Z,
                 // everything else (checkboxes/numbers) reads naturally highest/most-recent-first
-                sortDirection = (column === 'name') ? 'asc' : 'desc';
+                playerSort.direction = (column === 'name') ? 'asc' : 'desc';
             }
             renderPlayerList();
         }
@@ -718,9 +720,9 @@
         function getSortedPlayerIndices() {
             let indices = players.map((_, idx) => idx);
 
-            if (sortColumn === 'name') {
+            if (playerSort.column === 'name') {
                 indices.sort((a, b) => players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' }));
-            } else if (sortColumn === 'checkedIn') {
+            } else if (playerSort.column === 'checkedIn') {
                 indices.sort((a, b) => {
                     let minutesA = getCheckInMinutes(players[a].checkInTimestamp);
                     let minutesB = getCheckInMinutes(players[b].checkInTimestamp);
@@ -731,12 +733,12 @@
                     }
                     // Name tiebreaker always reads A→Z regardless of column
                     // sort direction. Since the whole array gets reversed below when
-                    // sortDirection is 'desc', negate the comparison here so it
+                    // playerSort.direction is 'desc', negate the comparison here so it
                     // lands back in A→Z order after that reversal.
                     let nameCompare = players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' });
-                    return sortDirection === 'desc' ? -nameCompare : nameCompare;
+                    return playerSort.direction === 'desc' ? -nameCompare : nameCompare;
                 });
-            } else if (sortColumn === 'gamesOffset') {
+            } else if (playerSort.column === 'gamesOffset') {
                 indices.sort((a, b) => {
                     let offsetA = (players[a].gamesOffset === null || players[a].gamesOffset === undefined) ? -1 : players[a].gamesOffset;
                     let offsetB = (players[b].gamesOffset === null || players[b].gamesOffset === undefined) ? -1 : players[b].gamesOffset;
@@ -746,9 +748,9 @@
                     // Name tiebreaker always reads A→Z regardless of column
                     // sort direction — see the same pattern in the checkedIn branch above.
                     let nameCompare = players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' });
-                    return sortDirection === 'desc' ? -nameCompare : nameCompare;
+                    return playerSort.direction === 'desc' ? -nameCompare : nameCompare;
                 });
-            } else if (sortColumn === 'gamesPlayed') {
+            } else if (playerSort.column === 'gamesPlayed') {
                 indices.sort((a, b) => {
                     if (players[a].gamesPlayed !== players[b].gamesPlayed) {
                         return players[a].gamesPlayed - players[b].gamesPlayed;
@@ -757,11 +759,11 @@
                     // sort direction — see the same pattern in the checkedIn and
                     // gamesOffset branches above.
                     let nameCompare = players[a].name.localeCompare(players[b].name, 'en', { sensitivity: 'accent' });
-                    return sortDirection === 'desc' ? -nameCompare : nameCompare;
+                    return playerSort.direction === 'desc' ? -nameCompare : nameCompare;
                 });
             }
 
-            if (sortDirection === 'desc') {
+            if (playerSort.direction === 'desc') {
                 indices.reverse();
             }
 
@@ -776,8 +778,8 @@
          */
         function sortableHeaderHTML(text, columnKey) {
             let arrow = '';
-            if (sortColumn === columnKey) {
-                arrow = sortDirection === 'asc' ? ' \u25B2' : ' \u25BC';
+            if (playerSort.column === columnKey) {
+                arrow = playerSort.direction === 'asc' ? ' \u25B2' : ' \u25BC';
             }
             return `<span class="sortable-header" onclick="setSortColumn('${columnKey}')">${escapeHtml(text)}${arrow}</span>`;
         }
