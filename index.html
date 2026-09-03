@@ -534,6 +534,26 @@
             "Pat Lawrence", "Pat Liang", "Phil", "Rafi", "Scott", "Steve Braunstein", "Steve Vlaun", "Troy", "Valeriy"
         ]);
 
+        /**
+         * Maps a roster select-option value to its underlying roster array.
+         * Single source of truth for this lookup — used by both switchRoster()
+         * and resetTracker() so the two never drift out of sync with each other
+         * or with the <select> options in the HTML.
+         */
+        function getRosterByKey(key) {
+            const rosterMap = {
+                empty: empty,
+                monday: monday,
+                tuesday: tuesday,
+                thursday: thursday,
+                thursdayGlenOaks: thursdayGlenOaks,
+                saturday: saturday,
+                sunday: sunday,
+                stelton: stelton
+            };
+            return rosterMap[key] || empty;
+        }
+
         let players = empty.map(p => ({ ...p }));
         let pendingTeam1Indices = [];
         let pendingTeam2Indices = [];
@@ -745,15 +765,7 @@
             let loaded = loadFromLocalStorage(selectedRoster);
 
             if (!loaded) {
-                let sourceList = empty;
-                if (selectedRoster === 'monday') sourceList = monday;
-                if (selectedRoster === 'tuesday') sourceList = tuesday;
-                if (selectedRoster === 'thursday') sourceList = thursday;
-                if (selectedRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
-                if (selectedRoster === 'saturday') sourceList = saturday;
-                if (selectedRoster === 'sunday') sourceList = sunday;
-                if (selectedRoster === 'stelton') sourceList = stelton;
-                
+                let sourceList = getRosterByKey(selectedRoster);
                 players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTimestamp: null, gamesOffset: null }));
                 lastGameIndices = [];
                 gamesHistory = [];
@@ -1078,15 +1090,7 @@
             const currentRoster = document.getElementById('rosterSelect').value;
             localStorage.removeItem('teams_tracker_state_' + currentRoster);
 
-            let sourceList = empty;
-            if (currentRoster === 'monday') sourceList = monday;
-            if (currentRoster === 'tuesday') sourceList = tuesday;
-            if (currentRoster === 'thursday') sourceList = thursday;
-            if (currentRoster === 'thursdayGlenOaks') sourceList = thursdayGlenOaks;
-            if (currentRoster === 'saturday') sourceList = saturday;
-            if (currentRoster === 'sunday') sourceList = sunday;
-            if (currentRoster === 'stelton') sourceList = stelton;
-
+            let sourceList = getRosterByKey(currentRoster);
             players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTimestamp: null, gamesOffset: null }));
             lastGameIndices = [];
             pendingTeam1Indices = [];
