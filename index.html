@@ -470,251 +470,69 @@
     </div>
 
     <script>
-        const empty = [];
+        /**
+         * Builds a roster's player objects from a flat list of names, applying the
+         * same default shape to every entry. Centralizes the player object shape so
+         * roster definitions can stay compact name lists instead of repeating
+         * gamesPlayed/available/checkedIn/etc. by hand for every single player.
+         */
+        function makeRoster(names) {
+            return names.map(name => ({
+                name: name,
+                gamesPlayed: 0,
+                available: false,
+                checkedIn: false,
+                checkInTimestamp: null,
+                gamesOffset: null
+            }));
+        }
 
-        const monday = [
-            { name: "Ah B", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Alex", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Aric", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Benny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Billy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Brian", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Chris", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Deric", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eric", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Fai", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Francis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Howard", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jeffrey", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Joe", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kelvin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kenji", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kenneth", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kit", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kobe", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kyth", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Lok", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Pat", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Raymond", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ricky", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Sunny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Timmy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Travis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Wayne", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "奶仔", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "蔡哥", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ];
+        const empty = makeRoster([]);
 
-        const tuesday = [
-            { name: "Adrian", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Alex", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Alex friend 1", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Andy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Angel", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Angel Jr", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Derek", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eric", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eric Jr", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Francis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jack", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jason", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "JD", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "JD friend 1", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "JD friend 2", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "JD friend 3", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kevin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Lam", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Mailman", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Randy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ray T", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Wing", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ];
+        const monday = makeRoster([
+            "Ah B", "Alex", "Aric", "Benny", "Billy", "Brian", "Chris", "Danny", "Deric", "Eric",
+            "Fai", "Francis", "Howard", "Jeffrey", "Joe", "Kelvin", "Kenji", "Kenneth", "Kit", "Kobe",
+            "Kyth", "Lok", "Pat", "Raymond", "Ricky", "Sunny", "Timmy", "Travis", "Wayne", "奶仔", "蔡哥"
+        ]);
 
-        const thursday = [
-            { name: "Benny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Bing", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Dan Lau", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "George", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Giles", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jack", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jay", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kenny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kok Kit Lee", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kwok", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Michael Leung", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Michael Poon", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Nelson", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Paul", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Peter", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Phil", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Steve", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Tony", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Wai Yip Lee", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "William", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "二少", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "建哥", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "梁光远", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "韓家聲", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ];
+        const tuesday = makeRoster([
+            "Adrian", "Alex", "Alex friend 1", "Andy", "Angel", "Angel Jr", "Danny", "Derek", "Eric", "Eric Jr",
+            "Francis", "Jack", "James", "Jason", "JD", "JD friend 1", "JD friend 2", "JD friend 3", "Kevin", "Lam",
+            "Mailman", "Randy", "Ray T", "Wing"
+        ]);
 
-        const thursdayGlenOaks = [
-            { name: "Alex", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Amenophis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Andrew", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Benghor", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Buddy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "David", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Demz", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Devon", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Flippa", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Francis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Fred", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "H", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Hing", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Indio", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James Lin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jay", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jimmy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Joe", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "JT", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Justin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kevin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "KevinBookher", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kyth", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Li", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Todd", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Tony", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ];
+        const thursday = makeRoster([
+            "Benny", "Bing", "Dan Lau", "Danny", "George", "Giles", "Jack", "James", "Jay", "Kenny",
+            "Kok Kit Lee", "Kwok", "Michael Leung", "Michael Poon", "Nelson", "Paul", "Peter", "Phil", "Steve", "Tony",
+            "Wai Yip Lee", "William", "二少", "建哥", "梁光远", "韓家聲"
+        ]);
 
-        const saturday = [
-            { name: "Adrian", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Alex", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Amenophis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Andrew Ng", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Andrew Yu", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Benghor", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Brian", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Buddy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Corey", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "David", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "David Jang", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Demz", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Devon", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eddie", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eliezer", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eric", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Flippa", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Francis", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Fred", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "G", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Gyu", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "H", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Hing", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Indio", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jabe", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James Lin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jason", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jay", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jim Turvey", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jimmy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Joe", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "John", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "John Kim", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jon", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Josh", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "JT", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Justin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kevin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "KevinBookher", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kyth", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Li", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Otari", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Paul", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Rashan", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ray", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ricky", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "RJ", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Steve", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Tasso", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Timothy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Todd", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Tony", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ];
+        const thursdayGlenOaks = makeRoster([
+            "Alex", "Amenophis", "Andrew", "Benghor", "Buddy", "Danny", "David", "Demz", "Devon", "Flippa",
+            "Francis", "Fred", "H", "Hing", "Indio", "James", "James Lin", "Jay", "Jimmy", "Joe",
+            "JT", "Justin", "Kevin", "KevinBookher", "Kyth", "Li", "Todd", "Tony"
+        ]);
 
-        const sunday = [
-            { name: "Adrian", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Alex", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Andy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Angel", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Angel Jr", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Bill", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Daniel", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Dofu", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Don", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Dong", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Edwin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Eugene", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jack", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "James", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jay", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "John", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kasing", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kent", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Kyo", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Mark", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Matthew", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Mike", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ray", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Randy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Sit Wong", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Waiho", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Wing", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Yili", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Zai Zai", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "梁光远", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
+        const saturday = makeRoster([
+            "Adrian", "Alex", "Amenophis", "Andrew Ng", "Andrew Yu", "Benghor", "Brian", "Buddy", "Corey", "Danny",
+            "David", "David Jang", "Demz", "Devon", "Eddie", "Eliezer", "Eric", "Flippa", "Francis", "Fred",
+            "G", "Gyu", "H", "Hing", "Indio", "Jabe", "James", "James Lin", "Jason", "Jay",
+            "Jim Turvey", "Jimmy", "Joe", "John", "John Kim", "Jon", "Josh", "JT", "Justin", "Kevin",
+            "KevinBookher", "Kyth", "Li", "Otari", "Paul", "Rashan", "Ray", "Ricky", "RJ", "Steve",
+            "Tasso", "Timothy", "Todd", "Tony"
+        ]);
 
-        const stelton = [
-            { name: "Adi", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ben", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Brent", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Chad", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Dan", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Danny", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Devin", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Ed", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Giles", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Houdine", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Joe", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Joel", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Joey", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Jose", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Keith", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Malik", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Marshall", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Matt", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Mike", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Mike Jr", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Pat Lawrence", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Pat Liang", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Phil", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Rafi", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Scott", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Steve Braunstein", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Steve Vlaun", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Troy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null },
-            { name: "Valeriy", gamesPlayed: 0, available: false, checkedIn: false, checkInTime: null }
-        ];
+        const sunday = makeRoster([
+            "Adrian", "Alex", "Andy", "Angel", "Angel Jr", "Bill", "Daniel", "Danny", "Dofu", "Don",
+            "Dong", "Edwin", "Eugene", "Jack", "James", "Jay", "John", "Kasing", "Kent", "Kyo",
+            "Mark", "Matthew", "Mike", "Ray", "Randy", "Sit Wong", "Waiho", "Wing", "Yili", "Zai Zai", "梁光远"
+        ]).sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'accent' }));
+
+        const stelton = makeRoster([
+            "Adi", "Ben", "Brent", "Chad", "Dan", "Danny", "Devin", "Ed", "Giles", "Houdine",
+            "Joe", "Joel", "Joey", "Jose", "Keith", "Malik", "Marshall", "Matt", "Mike", "Mike Jr",
+            "Pat Lawrence", "Pat Liang", "Phil", "Rafi", "Scott", "Steve Braunstein", "Steve Vlaun", "Troy", "Valeriy"
+        ]);
 
         let players = empty.map(p => ({ ...p }));
         let pendingTeam1Indices = [];
