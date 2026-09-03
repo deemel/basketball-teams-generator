@@ -554,6 +554,11 @@
             return rosterMap[key] || empty;
         }
 
+        // localStorage key prefixes/names — centralized here so every read/write
+        // uses the exact same string, with no risk of a typo causing a silent mismatch.
+        const STORAGE_KEY_PREFIX = 'teams_tracker_state_';
+        const STORAGE_KEY_LAST_ROSTER = 'teams_tracker_last_roster';
+
         let players = empty.map(p => ({ ...p }));
         let pendingTeam1Indices = [];
         let pendingTeam2Indices = [];
@@ -570,12 +575,12 @@
                 gamesHistory: gamesHistory,
                 lastGameIndices: lastGameIndices
             };
-            localStorage.setItem('teams_tracker_state_' + currentRoster, JSON.stringify(state));
-            localStorage.setItem('teams_tracker_last_roster', currentRoster);
+            localStorage.setItem(STORAGE_KEY_PREFIX + currentRoster, JSON.stringify(state));
+            localStorage.setItem(STORAGE_KEY_LAST_ROSTER, currentRoster);
         }
 
         function loadFromLocalStorage(rosterKey) {
-            const savedState = localStorage.getItem('teams_tracker_state_' + rosterKey);
+            const savedState = localStorage.getItem(STORAGE_KEY_PREFIX + rosterKey);
             if (savedState) {
                 try {
                     const parsed = JSON.parse(savedState);
@@ -1088,7 +1093,7 @@
 
         function resetTracker() {
             const currentRoster = document.getElementById('rosterSelect').value;
-            localStorage.removeItem('teams_tracker_state_' + currentRoster);
+            localStorage.removeItem(STORAGE_KEY_PREFIX + currentRoster);
 
             let sourceList = getRosterByKey(currentRoster);
             players = sourceList.map(p => ({ ...p, available: false, checkedIn: false, checkInTimestamp: null, gamesOffset: null }));
@@ -1458,7 +1463,7 @@
         }
 
         // Initialize state on page load
-        const lastRoster = localStorage.getItem('teams_tracker_last_roster') || 'empty';
+        const lastRoster = localStorage.getItem(STORAGE_KEY_LAST_ROSTER) || 'empty';
         document.getElementById('rosterSelect').value = lastRoster;
         switchRoster();
     </script>
