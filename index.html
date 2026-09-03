@@ -1482,11 +1482,18 @@
             lastGameIndices = currentSelectedTeam;
             renderPlayerList();
 
-            // Add to games history with current date and time timestamp
+            // Add to games history with current date/time. timestampMs is the
+            // authoritative sortable value (used by getSortedHistoryIndices());
+            // "timestamp" remains the human-readable display string.
             let team1Names = pendingTeam1Indices.map(i => players[i].name);
             let team2Names = pendingTeam2Indices.map(i => players[i].name);
-            let timestamp = new Date().toLocaleString();
-            gamesHistory.push({ team1: team1Names, team2: team2Names, timestamp: timestamp });
+            let nowMs = Date.now();
+            gamesHistory.push({
+                team1: team1Names,
+                team2: team2Names,
+                timestamp: new Date(nowMs).toLocaleString(),
+                timestampMs: nowMs
+            });
             renderHistory();
             saveToLocalStorage();
 
@@ -1510,9 +1517,11 @@
             // Remove game entry from history
             gamesHistory.splice(historyIndex, 1);
 
-            // Update lastGameIndices to reflect previous game or clear if empty
+            // Update lastGameIndices to reflect the most recent remaining game
+            // (by timestampMs, matching the display order), or clear if empty
             if (gamesHistory.length > 0) {
-                let lastGame = gamesHistory[gamesHistory.length - 1];
+                let mostRecentIdx = getSortedHistoryIndices()[0];
+                let lastGame = gamesHistory[mostRecentIdx];
                 let lastGameNames = [...lastGame.team1, ...lastGame.team2];
                 lastGameIndices = players
                     .map((p, idx) => lastGameNames.includes(p.name) ? idx : -1)
@@ -1527,6 +1536,27 @@
             saveToLocalStorage();
         }
 
+        /**
+         * Returns gamesHistory indices ordered newest-first by timestampMs.
+         * Falls back to array position (descending) for legacy entries saved
+         * before timestampMs existed, so display order stays sensible even
+         * for old saved data. Ties (identical or missing timestamps) fall
+         * back to array position, later position first.
+         */
+        function getSortedHistoryIndices() {
+            let indices = gamesHistory.map((_, idx) => idx);
+            indices.sort((a, b) => {
+                let tsA = gamesHistory[a].timestampMs;
+                let tsB = gamesHistory[b].timestampMs;
+                if (tsA === undefined && tsB === undefined) return b - a;
+                if (tsA === undefined) return 1;
+                if (tsB === undefined) return -1;
+                if (tsA !== tsB) return tsB - tsA;
+                return b - a;
+            });
+            return indices;
+        }
+
         function renderHistory() {
             const historyContainer = document.getElementById('historyContainer');
             const historyCard = document.getElementById('historyCard');
@@ -1539,7 +1569,8 @@
 
             historyCard.style.display = 'block';
 
-            gamesHistory.forEach((game, index) => {
+            getSortedHistoryIndices().forEach((index) => {
+                let game = gamesHistory[index];
                 let gameDiv = document.createElement('div');
                 gameDiv.className = 'history-item';
 
