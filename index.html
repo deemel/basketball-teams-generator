@@ -1283,11 +1283,13 @@
             // Remove game entry from history
             gamesHistory.splice(historyIndex, 1);
 
-            // Update lastGameIndices to reflect the most recent remaining game
-            // (array position is the authoritative order — see
-            // getSortedHistoryIndices()), or clear if empty
+            // Update lastGameIndices to reflect the most recent remaining game,
+            // or clear if empty
             if (gamesHistory.length > 0) {
-                let mostRecentIdx = getSortedHistoryIndices()[0];
+                // Array position is the authoritative chronological order (see
+                // getSortedHistoryIndices()), so the most recent remaining game
+                // is simply the last element.
+                let mostRecentIdx = gamesHistory.length - 1;
                 let lastGame = gamesHistory[mostRecentIdx];
                 let lastGameNames = [...lastGame.team1, ...lastGame.team2];
                 lastGameIndices = players
