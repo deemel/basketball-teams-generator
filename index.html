@@ -674,6 +674,22 @@
         }
 
         /**
+         * Escapes HTML-significant characters in a string before it's interpolated
+         * into an innerHTML template. Needed because player names and other
+         * user-entered text are set via innerHTML template strings (not textContent,
+         * which auto-escapes), so this prevents that content from being interpreted
+         * as markup.
+         */
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /**
          * Converts a checkInTimestamp into minutes since midnight (local time),
          * matching the same hh:mm granularity shown in the UI via
          * formatCheckInTime(). Used for sorting so two check-ins that display
@@ -752,17 +768,18 @@
             return indices;
         }
 
-        function createSortableHeaderLabel(text, columnKey) {
-            let span = document.createElement('span');
-            span.className = 'sortable-header';
-            span.onclick = function() { setSortColumn(columnKey); };
-
+        /**
+         * Returns the HTML for a clickable, sortable column header label,
+         * including the ▲/▼ arrow when this column is the active sort column.
+         * Replaces the old DOM-node-returning createSortableHeaderLabel() now
+         * that renderPlayerList() builds its markup via template strings.
+         */
+        function sortableHeaderHTML(text, columnKey) {
             let arrow = '';
             if (sortColumn === columnKey) {
                 arrow = sortDirection === 'asc' ? ' \u25B2' : ' \u25BC';
             }
-            span.textContent = text + arrow;
-            return span;
+            return `<span class="sortable-header" onclick="setSortColumn('${columnKey}')">${escapeHtml(text)}${arrow}</span>`;
         }
 
         function switchRoster() {
@@ -857,6 +874,13 @@
             saveToLocalStorage();
         }
 
+        /**
+         * Renders the player list: a sortable header row plus one row per
+         * player. Builds the whole thing as an HTML string via template
+         * literals and sets it in a single innerHTML assignment, rather than
+         * constructing each element/attribute individually with
+         * document.createElement — same visual result, far less code.
+         */
         function renderPlayerList() {
             const container = document.getElementById('playerContainer');
 
@@ -864,161 +888,86 @@
             const existingRows = container.querySelector('.player-rows');
             const previousScrollTop = existingRows ? existingRows.scrollTop : 0;
 
-            container.innerHTML = '';
-
-            let headerDiv = document.createElement('div');
-            headerDiv.className = 'list-header';
-
-            let headerLeftGroup = document.createElement('div');
-            headerLeftGroup.className = 'header-left-group';
-
             let totalCount = players.length;
             let availableCount = players.filter(p => p.available).length;
-
-            let selectAllCheckbox = document.createElement('input');
-            selectAllCheckbox.type = 'checkbox';
-            selectAllCheckbox.id = 'selectAllCheckbox';
-            selectAllCheckbox.checked = totalCount > 0 && availableCount === totalCount;
-            selectAllCheckbox.indeterminate = availableCount > 0 && availableCount < totalCount;
-            selectAllCheckbox.onchange = function() { toggleSelectAllAvailable(selectAllCheckbox.checked); };
-            headerLeftGroup.appendChild(selectAllCheckbox);
-
-            let headerLabel = createSortableHeaderLabel("Player Name", 'name');
-            headerLeftGroup.appendChild(headerLabel);
-
-            let headerCenterGroup = document.createElement('div');
-            headerCenterGroup.className = 'header-center-group';
-
             let checkedInCount = players.filter(p => p.checkedIn).length;
 
-            let selectAllCheckedInCheckbox = document.createElement('input');
-            selectAllCheckedInCheckbox.type = 'checkbox';
-            selectAllCheckedInCheckbox.id = 'selectAllCheckedInCheckbox';
-            selectAllCheckedInCheckbox.checked = totalCount > 0 && checkedInCount === totalCount;
-            selectAllCheckedInCheckbox.indeterminate = checkedInCount > 0 && checkedInCount < totalCount;
-            selectAllCheckedInCheckbox.onchange = function() { toggleAllCheckedIn(selectAllCheckedInCheckbox.checked); };
-            headerCenterGroup.appendChild(selectAllCheckedInCheckbox);
-
-            let checkedInLabel = createSortableHeaderLabel("Checked In", 'checkedIn');
-            headerCenterGroup.appendChild(checkedInLabel);
-
-            let headerOffsetGroup = document.createElement('div');
-            headerOffsetGroup.className = 'header-offset-group';
-            let offsetLabel = createSortableHeaderLabel("Games Offset", 'gamesOffset');
-            headerOffsetGroup.appendChild(offsetLabel);
-
-            let headerRightGroup = document.createElement('div');
-            headerRightGroup.className = 'header-right-group';
-            let gamesPlayedSpan = createSortableHeaderLabel("Games Played", 'gamesPlayed');
-            headerRightGroup.appendChild(gamesPlayedSpan);
-
-            headerDiv.appendChild(headerLeftGroup);
-            headerDiv.appendChild(headerCenterGroup);
-            headerDiv.appendChild(headerOffsetGroup);
-            headerDiv.appendChild(headerRightGroup);
-            container.appendChild(headerDiv);
-
-            let rowsContainer = document.createElement('div');
-            rowsContainer.className = 'player-rows';
-            container.appendChild(rowsContainer);
-
             let sortedIndices = getSortedPlayerIndices();
-            sortedIndices.forEach((index) => {
+
+            let rowsHtml = sortedIndices.map((index) => {
                 let p = players[index];
-                let div = document.createElement('div');
-                div.className = 'player-item';
+                let nameColor = p.available ? '#000' : '#888';
+                let checkInTimeHtml = (p.checkedIn && p.checkInTimestamp)
+                    ? `<span class="checkin-time">${escapeHtml(formatCheckInTime(p.checkInTimestamp))}</span>`
+                    : '';
+                let offsetText = (p.gamesOffset === null || p.gamesOffset === undefined) ? '-' : p.gamesOffset;
 
-                // Left Column: Available & Player Name
-                let leftGroup = document.createElement('div');
-                leftGroup.className = 'player-left-group';
+                return `
+                    <div class="player-item">
+                        <div class="player-left-group">
+                            <div class="player-info">
+                                <input type="checkbox" id="available_${index}" ${p.available ? 'checked' : ''}
+                                    onchange="toggleAvailable(${index}, this.checked)">
+                                <label for="available_${index}" style="cursor: pointer; color: ${nameColor};">${escapeHtml(p.name)}</label>
+                            </div>
+                        </div>
+                        <div class="player-center-group">
+                            <input type="checkbox" id="checkedIn_${index}" ${p.checkedIn ? 'checked' : ''}
+                                onchange="toggleCheckedIn(${index}, this.checked)">
+                            ${checkInTimeHtml}
+                        </div>
+                        <div class="player-offset-group">
+                            <span class="stats-badge">${offsetText}</span>
+                        </div>
+                        <div class="player-right-group">
+                            <div class="counter-controls" style="display: flex; align-items: center; gap: 8px;">
+                                <button class="counter-btn" onclick="adjustGames(${index}, -1)">-</button>
+                                <span class="stats-badge">${p.gamesPlayed}</span>
+                                <button class="counter-btn" onclick="adjustGames(${index}, 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-                let availableCheckbox = document.createElement('input');
-                availableCheckbox.type = 'checkbox';
-                availableCheckbox.checked = p.available;
-                availableCheckbox.id = 'available_' + index;
-                availableCheckbox.onchange = function() { toggleAvailable(index, availableCheckbox.checked); };
+            container.innerHTML = `
+                <div class="list-header">
+                    <div class="header-left-group">
+                        <input type="checkbox" id="selectAllCheckbox" ${(totalCount > 0 && availableCount === totalCount) ? 'checked' : ''}
+                            onchange="toggleSelectAllAvailable(this.checked)">
+                        ${sortableHeaderHTML("Player Name", 'name')}
+                    </div>
+                    <div class="header-center-group">
+                        <input type="checkbox" id="selectAllCheckedInCheckbox" ${(totalCount > 0 && checkedInCount === totalCount) ? 'checked' : ''}
+                            onchange="toggleAllCheckedIn(this.checked)">
+                        ${sortableHeaderHTML("Checked In", 'checkedIn')}
+                    </div>
+                    <div class="header-offset-group">
+                        ${sortableHeaderHTML("Games Offset", 'gamesOffset')}
+                    </div>
+                    <div class="header-right-group">
+                        ${sortableHeaderHTML("Games Played", 'gamesPlayed')}
+                    </div>
+                </div>
+                <div class="player-rows">${rowsHtml}</div>
+            `;
 
-                let infoDiv = document.createElement('div');
-                infoDiv.className = 'player-info';
-
-                let label = document.createElement('label');
-                label.htmlFor = 'available_' + index;
-                label.textContent = p.name;
-                label.style.cursor = 'pointer';
-                if (!p.available) {
-                    label.style.color = '#888';
-                }
-
-                infoDiv.appendChild(availableCheckbox);
-                infoDiv.appendChild(label);
-                leftGroup.appendChild(infoDiv);
-
-                // Center Column: Left-aligned Check-In + Timestamp
-                let centerGroup = document.createElement('div');
-                centerGroup.className = 'player-center-group';
-
-                let checkedInCheckbox = document.createElement('input');
-                checkedInCheckbox.type = 'checkbox';
-                checkedInCheckbox.checked = p.checkedIn || false;
-                checkedInCheckbox.id = 'checkedIn_' + index;
-                checkedInCheckbox.onchange = function() { toggleCheckedIn(index, checkedInCheckbox.checked); };
-
-                centerGroup.appendChild(checkedInCheckbox);
-
-                if (p.checkedIn && p.checkInTimestamp) {
-                    let timeSpan = document.createElement('span');
-                    timeSpan.className = 'checkin-time';
-                    timeSpan.textContent = formatCheckInTime(p.checkInTimestamp);
-                    centerGroup.appendChild(timeSpan);
-                }
-
-                // Offset Column: Games Offset (average effective games played of already checked-in players at check-in time)
-                let offsetGroup = document.createElement('div');
-                offsetGroup.className = 'player-offset-group';
-
-                let offsetBadge = document.createElement('span');
-                offsetBadge.className = 'stats-badge';
-                offsetBadge.textContent = (p.gamesOffset === null || p.gamesOffset === undefined) ? '-' : p.gamesOffset;
-                offsetGroup.appendChild(offsetBadge);
-
-                // Right Column: Games Played Counter (minus, value, plus)
-                let rightGroup = document.createElement('div');
-                rightGroup.className = 'player-right-group';
-
-                let actionsDiv = document.createElement('div');
-                actionsDiv.className = 'counter-controls';
-                actionsDiv.style.display = 'flex';
-                actionsDiv.style.alignItems = 'center';
-                actionsDiv.style.gap = '8px';
-
-                let minusBtn = document.createElement('button');
-                minusBtn.textContent = '-';
-                minusBtn.className = 'counter-btn';
-                minusBtn.onclick = function() { adjustGames(index, -1); };
-
-                let badge = document.createElement('span');
-                badge.className = 'stats-badge';
-                badge.textContent = p.gamesPlayed;
-
-                let plusBtn = document.createElement('button');
-                plusBtn.textContent = '+';
-                plusBtn.className = 'counter-btn';
-                plusBtn.onclick = function() { adjustGames(index, 1); };
-
-                actionsDiv.appendChild(minusBtn);
-                actionsDiv.appendChild(badge);
-                actionsDiv.appendChild(plusBtn);
-                rightGroup.appendChild(actionsDiv);
-
-                div.appendChild(leftGroup);
-                div.appendChild(centerGroup);
-                div.appendChild(offsetGroup);
-                div.appendChild(rightGroup);
-                rowsContainer.appendChild(div);
-            });
+            // "indeterminate" can't be expressed via an HTML attribute, so it's
+            // set imperatively here right after the markup is inserted.
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.indeterminate = availableCount > 0 && availableCount < totalCount;
+            }
+            const selectAllCheckedInCheckbox = document.getElementById('selectAllCheckedInCheckbox');
+            if (selectAllCheckedInCheckbox) {
+                selectAllCheckedInCheckbox.indeterminate = checkedInCount > 0 && checkedInCount < totalCount;
+            }
 
             // Restore scroll position after rebuilding the list
-            rowsContainer.scrollTop = previousScrollTop;
+            const rowsContainer = container.querySelector('.player-rows');
+            if (rowsContainer) {
+                rowsContainer.scrollTop = previousScrollTop;
+            }
 
             updatePlayerCounts();
         }
@@ -1055,12 +1004,7 @@
                 return; // toggleCheckedIn() already re-renders and saves
             }
 
-            updatePlayerCounts();
-
-            const label = document.querySelector(`label[for="available_${index}"]`);
-            if (label) {
-                label.style.color = isAvailable ? '#000' : '#888';
-            }
+            renderPlayerList();
             saveToLocalStorage();
         }
 
@@ -1381,85 +1325,51 @@
             return indices;
         }
 
+        /**
+         * Renders the Games Played History card: one entry per game, newest
+         * first. Builds the whole thing as an HTML string via template
+         * literals and sets it in a single innerHTML assignment, rather than
+         * constructing each element with document.createElement.
+         */
         function renderHistory() {
             const historyContainer = document.getElementById('historyContainer');
             const historyCard = document.getElementById('historyCard');
-            historyContainer.innerHTML = '';
 
             if (gamesHistory.length === 0) {
+                historyContainer.innerHTML = '';
                 historyCard.style.display = 'none';
                 return;
             }
 
             historyCard.style.display = 'block';
 
-            getSortedHistoryIndices().forEach((index) => {
+            historyContainer.innerHTML = getSortedHistoryIndices().map((index) => {
                 let game = gamesHistory[index];
-                let gameDiv = document.createElement('div');
-                gameDiv.className = 'history-item';
+                let team1Html = game.team1.map(name => `<li>${escapeHtml(name)}</li>`).join('');
+                let team2Html = game.team2.map(name => `<li>${escapeHtml(name)}</li>`).join('');
 
-                let headerDiv = document.createElement('div');
-                headerDiv.className = 'history-item-header';
-
-                let title = document.createElement('h4');
-                title.textContent = `Game ${index + 1}`;
-
-                let headerRight = document.createElement('div');
-                headerRight.style.display = 'flex';
-                headerRight.style.alignItems = 'center';
-                headerRight.style.gap = '10px';
-
-                let timeSpan = document.createElement('span');
-                timeSpan.className = 'history-timestamp';
-                timeSpan.textContent = game.timestamp;
-
-                let deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.onclick = function() { deleteGame(index); };
-
-                headerRight.appendChild(timeSpan);
-                headerRight.appendChild(deleteBtn);
-
-                headerDiv.appendChild(title);
-                headerDiv.appendChild(headerRight);
-                gameDiv.appendChild(headerDiv);
-
-                let teamsContainer = document.createElement('div');
-                teamsContainer.className = 'teams-container';
-
-                let team1Div = document.createElement('div');
-                team1Div.className = 'team';
-                let t1Heading = document.createElement('h3');
-                t1Heading.textContent = 'Team 1';
-                let t1Ol = document.createElement('ol');
-                game.team1.forEach(name => {
-                    let li = document.createElement('li');
-                    li.textContent = name;
-                    t1Ol.appendChild(li);
-                });
-                team1Div.appendChild(t1Heading);
-                team1Div.appendChild(t1Ol);
-
-                let team2Div = document.createElement('div');
-                team2Div.className = 'team';
-                let t2Heading = document.createElement('h3');
-                t2Heading.textContent = 'Team 2';
-                let t2Ol = document.createElement('ol');
-                game.team2.forEach(name => {
-                    let li = document.createElement('li');
-                    li.textContent = name;
-                    t2Ol.appendChild(li);
-                });
-                team2Div.appendChild(t2Heading);
-                team2Div.appendChild(t2Ol);
-
-                teamsContainer.appendChild(team1Div);
-                teamsContainer.appendChild(team2Div);
-                gameDiv.appendChild(teamsContainer);
-
-                historyContainer.appendChild(gameDiv);
-            });
+                return `
+                    <div class="history-item">
+                        <div class="history-item-header">
+                            <h4>Game ${index + 1}</h4>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="history-timestamp">${escapeHtml(game.timestamp)}</span>
+                                <button class="delete-btn" onclick="deleteGame(${index})">Delete</button>
+                            </div>
+                        </div>
+                        <div class="teams-container">
+                            <div class="team">
+                                <h3>Team 1</h3>
+                                <ol>${team1Html}</ol>
+                            </div>
+                            <div class="team">
+                                <h3>Team 2</h3>
+                                <ol>${team2Html}</ol>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Initialize state on page load
