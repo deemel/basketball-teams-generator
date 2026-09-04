@@ -121,6 +121,17 @@
             align-items: center;
             gap: 6px;
         }
+        .today-badge {
+            background-color: #ff6600;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+            display: none;
+        }
         .player-list-container {
             display: flex;
             justify-content: space-between;
@@ -432,6 +443,7 @@
                     <option value="sunday">Sunday</option>
                     <option value="stelton">Stelton</option>
                 </select>
+                <span id="todayBadge" class="today-badge">Today</span>
             </div>
 
             <div class="control-group">
@@ -822,6 +834,20 @@
             return `<span class="sortable-header" onclick="setSortColumn('${columnKey}')">${escapeHtml(text)}${arrow}</span>`;
         }
 
+        /**
+         * Shows/hides the "Today" badge next to the roster dropdown, based on
+         * whether the currently selected roster matches today's day-of-week
+         * default (see getDefaultRosterKeyForToday()). Called whenever the
+         * selected roster changes, so the badge only ever appears next to the
+         * roster that was actually auto-selected for today.
+         */
+        function updateTodayBadge() {
+            const badge = document.getElementById('todayBadge');
+            const selectedRoster = document.getElementById('rosterSelect').value;
+            const todayRosterKey = getDefaultRosterKeyForToday();
+            badge.style.display = (todayRosterKey && selectedRoster === todayRosterKey) ? 'inline' : 'none';
+        }
+
         function switchRoster() {
             const selectedRoster = document.getElementById('rosterSelect').value;
             let loaded = loadFromLocalStorage(selectedRoster);
@@ -842,6 +868,7 @@
             hideAlert();
             renderPlayerList();
             renderHistory();
+            updateTodayBadge();
             saveToLocalStorage();
 
             const rowsContainer = document.querySelector('#playerContainer .player-rows');
