@@ -490,10 +490,12 @@
          * same default shape to every entry. Centralizes the player object shape so
          * roster definitions can stay compact name lists instead of repeating
          * gamesPlayed/available/checkedIn/etc. by hand for every single player.
+         * Names are trimmed defensively so stray whitespace in a roster
+         * definition can never cause a false-negative duplicate check later.
          */
         function makeRoster(names) {
             return names.map(name => ({
-                name: name,
+                name: name.trim(),
                 gamesPlayed: 0,
                 available: false,
                 checkedIn: false,
@@ -623,7 +625,10 @@
                         // Migrate legacy "games" key to "gamesPlayed" for data saved before this rename
                         let migratedGamesPlayed = (p.gamesPlayed !== undefined) ? p.gamesPlayed : (p.games || 0);
                         return {
-                            name: p.name,
+                            // Trimmed defensively — see makeRoster()'s comment; keeps
+                            // the duplicate-name check in addPlayer() reliable even
+                            // for data saved before this trimming was added.
+                            name: (p.name || '').trim(),
                             gamesPlayed: migratedGamesPlayed,
                             available: p.available || false,
                             checkedIn: p.checkedIn || false,
@@ -1018,7 +1023,11 @@
                 showAlert("Player name must be 16 characters or fewer.");
                 return;
             }
-            const isDuplicate = players.some(p => p.name.localeCompare(name, 'en', { sensitivity: 'accent' }) === 0);
+            // Both sides trimmed defensively: "name" is already trimmed above,
+            // and p.name is trimmed at every entry point (makeRoster(),
+            // loadFromLocalStorage()) — trimming here too means this check
+            // can never be fooled by stray whitespace regardless of source.
+            const isDuplicate = players.some(p => p.name.trim().localeCompare(name, 'en', { sensitivity: 'accent' }) === 0);
             if (isDuplicate) {
                 showAlert(`"${name}" is already on this roster.`);
                 return;
