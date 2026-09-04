@@ -554,23 +554,22 @@
             return rosterMap[key] || empty;
         }
 
+        // Index i = Date.getDay() result (0 = Sunday ... 6 = Saturday). null marks
+        // days with no associated roster (Wednesday, Friday), so
+        // getDefaultRosterKeyForToday() falls back to the last saved roster.
+        // Thursday has two rosters (thursday, thursdayGlenOaks) — 'thursday' is the default.
+        const ROSTER_KEY_BY_DAY_OF_WEEK = [
+            'sunday', 'monday', 'tuesday', null, 'thursday', null, 'saturday'
+        ];
+
         /**
          * Maps today's day of the week to a roster key, so the app can default
          * to "today's roster" on load. Returns null for days with no
-         * associated roster (Wednesday, Friday), so the caller can fall back
-         * to the last saved roster instead.
+         * associated roster, so the caller can fall back to the last saved
+         * roster instead.
          */
         function getDefaultRosterKeyForToday() {
-            const dayOfWeek = new Date().getDay(); // 0 = Sunday, 1 = Monday, ... 6 = Saturday
-            const rosterByDay = {
-                0: 'sunday',
-                1: 'monday',
-                2: 'tuesday',
-                4: 'thursday', // Thursday has two rosters (thursday, thursdayGlenOaks) — 'thursday' is the default
-                6: 'saturday'
-                // 3 (Wednesday) and 5 (Friday) intentionally have no entry
-            };
-            return rosterByDay[dayOfWeek] || null;
+            return ROSTER_KEY_BY_DAY_OF_WEEK[new Date().getDay()] || null;
         }
 
         // localStorage key prefixes/names — centralized here so every read/write
